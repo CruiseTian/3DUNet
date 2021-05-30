@@ -19,7 +19,7 @@ class LITS_preprocess:
         self.slice_down_scale = args.slice_down_scale
 
     def fix_data(self):
-        if not os.path.exists(join(self.fixed_path,'val-images')):    # 创建保存目录
+        if not os.path.exists(self.fixed_path):    # 创建保存目录
             os.makedirs(join(self.fixed_path,'train-images'))
             os.makedirs(join(self.fixed_path,'train-labels'))
             os.makedirs(join(self.fixed_path,'val-images'))
@@ -58,7 +58,7 @@ class LITS_preprocess:
         print("Ori shape:",ct_array.shape, seg_array.shape)
         if classes==2:
             # 将金标准中肝脏和肝肿瘤的标签融合为一个
-            seg_array[seg_array > 0] = 1
+            seg_array[seg_array != 0] = 1
         # 将灰度值在阈值之外的截断掉
         ct_array[ct_array > self.upper] = self.upper
         ct_array[ct_array < self.lower] = self.lower
@@ -135,4 +135,4 @@ if __name__ == '__main__':
     args = config.args 
     tool = LITS_preprocess(raw_dataset_path,fixed_dataset_path, args)
     tool.fix_data()                            # 对原始图像进行修剪并保存
-    # tool.write_train_val_name_list()      # 创建索引txt文件
+    tool.write_train_val_name_list()      # 创建索引txt文件

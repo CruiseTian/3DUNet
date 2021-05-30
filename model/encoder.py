@@ -44,7 +44,7 @@ class EncoderBlock(nn.Module):
         for k, op in self.module_dict.items():
             if k.startswith("conv"):
                 x = op(x)
-                features.append(x)
             else:
+                features.append(x)
                 x = op(x)
         return x, features
