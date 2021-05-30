@@ -20,19 +20,19 @@ class LITS_preprocess:
 
     def fix_data(self):
         if not os.path.exists(self.fixed_path):    # 创建保存目录
-            os.makedirs(join(self.fixed_path,'ct'))
-            os.makedirs(join(self.fixed_path, 'label'))
-        file_list = os.listdir(join(self.raw_root_path,'ct'))
+            os.makedirs(join(self.fixed_path,'train-images'))
+            os.makedirs(join(self.fixed_path, 'train-labels'))
+        file_list = os.listdir(join(self.raw_root_path,'ribfrac-train-images'))
         Numbers = len(file_list)
         print('Total numbers of samples is :',Numbers)
         for ct_file,i in zip(file_list,range(Numbers)):
             print("==== {} | {}/{} ====".format(ct_file, i+1,Numbers))
-            ct_path = os.path.join(self.raw_root_path, 'ct', ct_file)
-            seg_path = os.path.join(self.raw_root_path, 'label', ct_file.replace('volume', 'segmentation'))
+            ct_path = os.path.join(self.raw_root_path, 'ribfrac-train-images', ct_file)
+            seg_path = os.path.join(self.raw_root_path, 'ribfrac-train-labels', ct_file.replace('image', 'label'))
             new_ct, new_seg = self.process(ct_path, seg_path, classes = self.classes)
             if new_ct != None and new_seg != None:
-                sitk.WriteImage(new_ct, os.path.join(self.fixed_path, 'ct', ct_file))  
-                sitk.WriteImage(new_seg, os.path.join(self.fixed_path, 'label', ct_file.replace('volume', 'segmentation').replace('.nii', '.nii.gz')))
+                sitk.WriteImage(new_ct, os.path.join(self.fixed_path, 'train-images', ct_file))  
+                sitk.WriteImage(new_seg, os.path.join(self.fixed_path, 'train-labels', ct_file.replace('image', 'label')))
 
     def process(self, ct_path, seg_path, classes=None):
         ct = sitk.ReadImage(ct_path, sitk.sitkInt16)
@@ -119,5 +119,5 @@ if __name__ == '__main__':
 
     args = config.args 
     tool = LITS_preprocess(raw_dataset_path,fixed_dataset_path, args)
-    # tool.fix_data()                            # 对原始图像进行修剪并保存
-    tool.write_train_val_name_list()      # 创建索引txt文件
+    tool.fix_data()                            # 对原始图像进行修剪并保存
+    # tool.write_train_val_name_list()      # 创建索引txt文件
