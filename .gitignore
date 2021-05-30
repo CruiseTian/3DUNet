@@ -1,0 +1,9 @@
+#ignore some files
+.idea
+/__pycache__/
+*/__pycache__/
+/samples/
+/Lab/
+/runs/*/
+/fixed_data/
+.vscode/
