@@ -41,8 +41,8 @@ class EncoderBlock(nn.Module):
 
     def forward(self, x):
         features = []
-        for k, op in self.module_dict.item():
-            if k.startwith("conv"):
+        for k, op in self.module_dict.items():
+            if k.startswith("conv"):
                 x = op(x)
                 features.append(x)
             else:

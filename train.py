@@ -10,7 +10,7 @@ from tqdm import tqdm
 from collections import OrderedDict
 
 import config
-from model import UNet
+from model.UNet import UNet
 from dataset.dataset_lits_val import Val_Dataset
 from dataset.dataset_lits_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
@@ -66,14 +66,14 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
 if __name__ == '__main__':
     args = config.args
     save_path = os.path.join('./runs', args.save)
-    if not os.path.exists(save_path): os.mkdir(save_path)
+    if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
     train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,shuffle=True)
     val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False)
 
     # model info
-    model = UNet(in_channel=1, out_channel=args.n_labels).to(device)
+    model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
 
     model.apply(weights_init.init_model)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)

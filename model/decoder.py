@@ -46,11 +46,11 @@ class DecoderBlock(nn.Module):
         :param down_sampling_features: feature maps from encoder path
         :return: output
         """
-        for k, op in self.module_dict.item():
-            if k.startwith("deconv"):
+        for k, op in self.module_dict.items():
+            if k.startswith("deconv"):
                 x = op(x)
                 x = torch.cat((down_sampling_features[int(k[-1])], x), dim=1)
-            elif k.startwith("conv"):
+            elif k.startswith("conv"):
                 x = op(x)
             else:
                 x = op(x)
