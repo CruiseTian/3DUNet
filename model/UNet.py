@@ -1,5 +1,5 @@
-from encoder import EncoderBlock
-from decoder import DecoderBlock
+from .encoder import EncoderBlock
+from .decoder import DecoderBlock
 
 class UNet(nn.Module):
     def __init__(self, in_channels, out_channels, model_depth=4, pool_size=2):
