@@ -3,8 +3,8 @@ from torch import nn
 import torch.nn.functional as F
 
 class convTranspose(nn.Module):
-    def __init__(self, in_channels, out_channels, k_size=3，stride=2, padding=1, output_padding=1):
-        super(ConvTranspose，self).__init__()
+    def __init__(self, in_channels, out_channels, k_size=3, stride=2, padding=1, output_padding=1):
+        super(ConvTranspose, self).__init__()
         self.conv3d_transpose = nn.ConvTranspose3d(in_channels=in_channels, 
          out_channels=out_channels,
          kernel_size=k_size,
@@ -16,7 +16,7 @@ class convTranspose(nn.Module):
 
 class DecoderBlock(nn.Module):
     def __init__(self, out_channels, model_depth=4):
-        super(DecoderBlock，self).__init__()
+        super(DecoderBlock, self).__init__()
         self.num_conv_blocks=2
         self.num_feat_maps=16
         #use nn.ModuleDict() to store ops 
@@ -31,10 +31,10 @@ class DecoderBlock(nn.Module):
             for i in range(self.num_conv_blocks):
                 if i == 0:
                     self.conv = ConvBlock(in_channels=feat_map_channels * 6,out_channels=feat_map_channels * 2)
-                    self.module_dict["conv_{}_{}".format(depth，i)] = self.conv
+                    self.module_dict["conv_{}_{}".format(depth, i)] = self.conv
                 else:
-                    self.conv = ConvBlock(in_channels=feat_map channels * 2, out_channels=feat_map_channels * 2)
-                    self.module_dict["conv_{}_{}".format(depth，i)]=self.conv 
+                    self.conv = ConvBlock(in_channels=feat_map_channels * 2, out_channels=feat_map_channels * 2)
+                    self.module_dict["conv_{}_{}".format(depth, i)]=self.conv 
             if depth == 0:
                 self.final_conv = ConvBlock(in_channels=feat_map_channels * 2, out_channels=out_channels)
                 self.module_dict["final_conv"]=self.final_conv
