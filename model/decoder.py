@@ -1,8 +1,9 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
+from .encoder import ConvBlock
 
-class convTranspose(nn.Module):
+class ConvTranspose(nn.Module):
     def __init__(self, in_channels, out_channels, k_size=3, stride=2, padding=1, output_padding=1):
         super(ConvTranspose, self).__init__()
         self.conv3d_transpose = nn.ConvTranspose3d(in_channels=in_channels, 
