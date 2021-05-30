@@ -10,6 +10,7 @@ class ConvTranspose(nn.Module):
          out_channels=out_channels,
          kernel_size=k_size,
          stride=stride,
+         padding=padding,
          output_padding=output_padding)
     
     def forward(self, x):
