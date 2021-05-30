@@ -1,3 +1,4 @@
+from torch import nn
 from .encoder import EncoderBlock
 from .decoder import DecoderBlock
 
