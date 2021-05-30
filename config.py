@@ -18,7 +18,7 @@ parser.add_argument('--slice_down_scale', type=float, default=1.0, help='')
 # data in/out and dataset
 parser.add_argument('--dataset_path',default = '/content/gdrive/Shareddrives/课程实验/datasets',help='fixed trainset root path')
 parser.add_argument('--test_data_path',default = '/content/gdrive/Shareddrives/课程实验/datasets/',help='Testset path')
-parser.add_argument('--save',default='ResUNet',help='save path of trained model')
+parser.add_argument('--save',default='UNet',help='save path of trained model')
 parser.add_argument('--batch_size', type=list, default=2,help='batch size of trainset')
 
 # train
