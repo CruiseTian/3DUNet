@@ -19,12 +19,15 @@ class LITS_preprocess:
         self.slice_down_scale = args.slice_down_scale
 
     def fix_data(self):
-        if not os.path.exists(self.fixed_path):    # 创建保存目录
+        if not os.path.exists(join(self.fixed_path,'val-images')):    # 创建保存目录
             os.makedirs(join(self.fixed_path,'train-images'))
-            os.makedirs(join(self.fixed_path, 'train-labels'))
+            os.makedirs(join(self.fixed_path,'train-labels'))
+            os.makedirs(join(self.fixed_path,'val-images'))
+            os.makedirs(join(self.fixed_path,'val-labels'))
+        # train
         file_list = os.listdir(join(self.raw_root_path,'ribfrac-train-images'))
         Numbers = len(file_list)
-        print('Total numbers of samples is :',Numbers)
+        print('Total numbers of train samples is :',Numbers)
         for ct_file,i in zip(file_list,range(Numbers)):
             print("==== {} | {}/{} ====".format(ct_file, i+1,Numbers))
             ct_path = os.path.join(self.raw_root_path, 'ribfrac-train-images', ct_file)
@@ -33,6 +36,18 @@ class LITS_preprocess:
             if new_ct != None and new_seg != None:
                 sitk.WriteImage(new_ct, os.path.join(self.fixed_path, 'train-images', ct_file))  
                 sitk.WriteImage(new_seg, os.path.join(self.fixed_path, 'train-labels', ct_file.replace('image', 'label')))
+        # val
+        file_list = os.listdir(join(self.raw_root_path,'ribfrac-val-images'))
+        Numbers = len(file_list)
+        print('Total numbers of val samples is :',Numbers)
+        for ct_file,i in zip(file_list,range(Numbers)):
+            print("==== {} | {}/{} ====".format(ct_file, i+1,Numbers))
+            ct_path = os.path.join(self.raw_root_path, 'ribfrac-val-images', ct_file)
+            seg_path = os.path.join(self.raw_root_path, 'ribfrac-val-labels', ct_file.replace('image', 'label'))
+            new_ct, new_seg = self.process(ct_path, seg_path, classes = self.classes)
+            if new_ct != None and new_seg != None:
+                sitk.WriteImage(new_ct, os.path.join(self.fixed_path, 'val-images', ct_file))  
+                sitk.WriteImage(new_seg, os.path.join(self.fixed_path, 'val-labels', ct_file.replace('image', 'label')))
 
     def process(self, ct_path, seg_path, classes=None):
         ct = sitk.ReadImage(ct_path, sitk.sitkInt16)
@@ -89,33 +104,33 @@ class LITS_preprocess:
         return new_ct, new_seg
 
     def write_train_val_name_list(self):
-        train_name_list = os.listdir(join(self.fixed_path, "ribfrac-train-images"))
+        train_name_list = os.listdir(join(self.fixed_path, "train-images"))
         train_num = len(train_name_list)
         print('the fixed dataset total numbers of train samples is :', train_num)
         random.shuffle(train_name_list)
 
-        val_name_list = os.listdir(join(self.fixed_path, "ribfrac-val-images"))
+        val_name_list = os.listdir(join(self.fixed_path, "val-images"))
         val_num = len(val_name_list)
         print('the fixed dataset total numbers of val samples is :', val_num)
 
         f = open(join(self.fixed_path, "train_path_list.txt"), 'w')
         for name in train_name_list:
-            ct_path = os.path.join(self.fixed_path, 'ribfrac-train-images', name)
-            seg_path = os.path.join(self.fixed_path, 'ribfrac-train-labels', name.replace('image', 'label'))
+            ct_path = os.path.join(self.fixed_path, 'train-images', name)
+            seg_path = os.path.join(self.fixed_path, 'train-labels', name.replace('image', 'label'))
             f.write(ct_path + ' ' + seg_path + "\n")
         f.close()
 
         f = open(join(self.fixed_path, "val_path_list.txt"), 'w')
         for name in val_name_list:
-            ct_path = os.path.join(self.fixed_path, 'ribfrac-val-images', name)
-            seg_path = os.path.join(self.fixed_path, 'ribfrac-val-labels', name.replace('image', 'label'))
+            ct_path = os.path.join(self.fixed_path, 'val-images', name)
+            seg_path = os.path.join(self.fixed_path, 'val-labels', name.replace('image', 'label'))
             f.write(ct_path + ' ' + seg_path + "\n")
         f.close()
 
 
 if __name__ == '__main__':
     raw_dataset_path = '/content/gdrive/Shareddrives/课程实验/datasets/'
-    fixed_dataset_path = '/content/gdrive/Shareddrives/课程实验/datasets/'
+    fixed_dataset_path = '/content/gdrive/Shareddrives/课程实验/datasets/process/'
 
     args = config.args 
     tool = LITS_preprocess(raw_dataset_path,fixed_dataset_path, args)
