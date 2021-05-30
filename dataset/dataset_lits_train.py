@@ -1,68 +1,43 @@
-from posixpath import join
-from torch.utils.data import DataLoader
 import os
 import sys
 import random
-from torchvision.transforms import RandomCrop
 import numpy as np
 import SimpleITK as sitk
 import torch
 from torch.utils.data import Dataset as dataset
-from .transforms import RandomCrop, RandomFlip_LR, RandomFlip_UD, Center_Crop, Compose, Resize
+from .transforms import Window, Normalize, Compose
 
 class Train_Dataset(dataset):
     def __init__(self, args):
 
         self.args = args
+        self.image_dir = os.path.join(args.dataset_path, "ribfrac-train-images")
+        self.label_dir = os.path.join(args.dataset_path, "ribfrac-train-labels")
 
-        self.filename_list = self.load_file_name_list(os.path.join(args.dataset_path, 'train_path_list.txt'))
-
+        self.files_prefix = sorted([x.split("-")[0]
+            for x in os.listdir(self.image_dir)])
         self.transforms = Compose([
-                RandomCrop(self.args.crop_size),
-                RandomFlip_LR(prob=0.5),
-                RandomFlip_UD(prob=0.5),
-                # RandomRotate()
+                Window(args.lower, args.upper),
+                Normalize(args.lower, args.upper)
             ])
 
     def __getitem__(self, index):
+        file_prefix = self.files_prefix[index]
+        img = sitk.ReadImage(os.path.join(self.image_dir, f"{file_prefix}-image.nii.gz"), sitk.sitkInt16)
+        label = sitk.ReadImage(os.path.join(self.image_dir, f"{file_prefix}-label.nii.gz"), sitk.sitkUInt8)
 
-        ct = sitk.ReadImage(self.filename_list[index][0], sitk.sitkInt16)
-        seg = sitk.ReadImage(self.filename_list[index][1], sitk.sitkUInt8)
+        img_array = sitk.GetArrayFromImage(img)
+        label_array = sitk.GetArrayFromImage(label)
 
-        ct_array = sitk.GetArrayFromImage(ct)
-        seg_array = sitk.GetArrayFromImage(seg)
+        img_array = img_array.astype(np.float32)
 
-        ct_array = ct_array / self.args.norm_factor
-        ct_array = ct_array.astype(np.float32)
-
-        ct_array = torch.FloatTensor(ct_array).unsqueeze(0)
-        seg_array = torch.FloatTensor(seg_array).unsqueeze(0)
+        img_array = torch.FloatTensor(img_array).unsqueeze(0)
+        label_array = torch.FloatTensor(label_array).unsqueeze(0)
 
         if self.transforms:
-            ct_array,seg_array = self.transforms(ct_array, seg_array)     
+            img_array = self.transforms(img_array)     
 
-        return ct_array, seg_array.squeeze(0)
+        return img_array, label_array.squeeze(0)
 
     def __len__(self):
-        return len(self.filename_list)
-
-    def load_file_name_list(self, file_path):
-        file_name_list = []
-        with open(file_path, 'r') as file_to_read:
-            while True:
-                lines = file_to_read.readline().strip()  # 整行读取数据
-                if not lines:
-                    break
-                file_name_list.append(lines.split())
-        return file_name_list
-
-if __name__ == "__main__":
-    sys.path.append('/ssd/lzq/3DUNet')
-    from config import args
-    train_ds = Train_Dataset(args)
-
-    # 定义数据加载
-    train_dl = DataLoader(train_ds, 2, False, num_workers=1)
-
-    for i, (ct, seg) in enumerate(train_dl):
-        print(i,ct.size(),seg.size())
+        return len(self.files_prefix)
