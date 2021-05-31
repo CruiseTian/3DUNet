@@ -55,21 +55,25 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         train_dice.update(output, target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_liver': train_dice.avg[1]})
-    if n_labels==3: val_log.update({'Train_dice_tumor': train_dice.avg[2]})
     return val_log
 
 
 if __name__ == '__main__':
     args = config.args
-    save_path = os.path.join('./runs', args.save)
+    save_path = os.path.join(args.save, 'runs')
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
-    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,shuffle=True)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False)
+    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,shuffle=False,collate_fn=Train_Dataset.collate_fn)
+    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False,collate_fn=Train_Dataset.collate_fn)
 
     # model info
-    model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
+    if args.weight is not None:
+        model = torch.load(args.weight).to(device)
+        log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
+    else:
+        model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
+        log = logger.Train_Logger(save_path,"train_log")
 
     model.apply(weights_init.init_model)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
@@ -78,9 +82,7 @@ if __name__ == '__main__':
     loss = loss.DiceLoss()
     # loss = SoftDiceLoss()
 
-    log = logger.Train_Logger(save_path,"train_log")
-
-    best = [0,0] # 初始化最优模型的epoch和performance
+    best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
     trigger = 0  # early stop 计数器
     alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(1, args.epochs + 1):

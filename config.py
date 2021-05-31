@@ -6,7 +6,8 @@ parser = argparse.ArgumentParser(description='Hyper-parameters management')
 parser.add_argument('--seed', type=int, default=2021, help='random seed')
 
 # Preprocess parameters
-parser.add_argument('--n_labels', type=int, default=2,help='number of classes') # 分割肝脏则置为2（二类分割），分割肝脏和肿瘤则置为3（三类分割）
+parser.add_argument('--weight', type=str, default=None, help='model init weight')
+parser.add_argument('--n_labels', type=int, default=2,help='number of classes')
 parser.add_argument('--upper', type=int, default=1000, help='')
 parser.add_argument('--lower', type=int, default=-200, help='')
 parser.add_argument('--norm_factor', type=float, default=200.0, help='')
@@ -18,7 +19,7 @@ parser.add_argument('--slice_down_scale', type=float, default=1.0, help='')
 # data in/out and dataset
 parser.add_argument('--dataset_path',default = '/content/gdrive/Shareddrives/课程实验/datasets/',help='fixed trainset root path')
 parser.add_argument('--test_data_path',default = '/content/gdrive/Shareddrives/课程实验/datasets/',help='Testset path')
-parser.add_argument('--save',default='UNet',help='save path of trained model')
+parser.add_argument('--save_path',default='/content/gdrive/Shareddrives/课程实验/',help='save path of trained model')
 parser.add_argument('--batch_size', type=int, default=2,help='batch size of trainset')
 
 # train

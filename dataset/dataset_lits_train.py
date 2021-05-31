@@ -160,7 +160,7 @@ class Train_Dataset(dataset):
         label_rois = torch.tensor(label_rois[:, np.newaxis],
             dtype=torch.float)
 
-        return image_rois.squeeze(1), label_rois.squeeze(1)
+        return image_rois, label_rois
 
     def __len__(self):
         return len(self.files_prefix)

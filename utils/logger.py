@@ -6,8 +6,11 @@ import numpy as np
 from collections import OrderedDict
 
 class Train_Logger():
-    def __init__(self,save_path,save_name):
-        self.log = None
+    def __init__(self,save_path,save_name,init=None):
+        if init is not None:
+            self.log = pd.read_csv(init)
+        else:
+            self.log = None
         self.summary = None
         self.save_path = save_path
         self.save_name = save_name
