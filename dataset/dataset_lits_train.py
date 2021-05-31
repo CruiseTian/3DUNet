@@ -25,7 +25,7 @@ class Train_Dataset(dataset):
     def __getitem__(self, index):
         file_prefix = self.files_prefix[index]
         img = sitk.ReadImage(os.path.join(self.image_dir, f"{file_prefix}-image.nii.gz"), sitk.sitkInt16)
-        label = sitk.ReadImage(os.path.join(self.image_dir, f"{file_prefix}-label.nii.gz"), sitk.sitkUInt8)
+        label = sitk.ReadImage(os.path.join(self.label_dir, f"{file_prefix}-label.nii.gz"), sitk.sitkUInt8)
 
         img_array = sitk.GetArrayFromImage(img)
         label_array = sitk.GetArrayFromImage(label)
