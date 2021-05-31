@@ -9,12 +9,13 @@ from .transforms import Window, Normalize, Compose, RandomRotate
 import nibabel as nib
 from skimage.measure import regionprops
 from itertools import product
+
 class Train_Dataset(dataset):
     def __init__(self, args):
 
         self.args = args
-        self.image_dir = os.path.join(args.dataset_path, "ribfrac-train-images")
-        self.label_dir = os.path.join(args.dataset_path, "ribfrac-train-labels")
+        self.image_dir = os.path.join(args.dataset_path, "ribfrac-val-images")
+        self.label_dir = os.path.join(args.dataset_path, "ribfrac-val-labels")
 
         self.files_prefix = sorted([x.split("-")[0]
             for x in os.listdir(self.image_dir)])
@@ -24,7 +25,7 @@ class Train_Dataset(dataset):
             ])
         self.train=True
         self.num_samples = 4
-        self.crop_size = 64
+        self.crop_size = args.crop_size
 
     @staticmethod
     def _get_pos_centroids(label_arr):
@@ -152,7 +153,7 @@ class Train_Dataset(dataset):
             for centroid in roi_centroids]
 
         if self.transforms:
-            image_rois, label_rois = self.transforms(image_rois, label_rois)
+            image_rois = self.transforms(image_rois)
 
         image_rois = torch.tensor(np.stack(image_rois)[:, np.newaxis],
             dtype=torch.float)

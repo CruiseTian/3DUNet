@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 import config
 from model.UNet import UNet
-from dataset.dataset_lits_val import Val_Dataset
-from dataset.dataset_lits_train import Train_Dataset
+from dataset.dataset_val import Val_Dataset
+from dataset.dataset_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
 
 def val(model, val_loader, loss_func, n_labels):
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
     train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,shuffle=False,collate_fn=Train_Dataset.collate_fn)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False,collate_fn=Train_Dataset.collate_fn)
+    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False,collate_fn=Val_Dataset.collate_fn)
 
     # model info
     model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
