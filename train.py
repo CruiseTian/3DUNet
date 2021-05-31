@@ -70,14 +70,17 @@ if __name__ == '__main__':
     # model info
     model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
     if args.weight is not None:
-        model_weight = torch.load(args.weight)['net']
-        model.load_state_dict(model_weight['net']).to(device)
+        checkpoint = torch.load(args.weight)['net']
+        model.load_state_dict(checkpoint['net']).to(device)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        optimizer.load_state_dict(checkpoint['optimizer']).to(device)
+        start_epoch = checkpoint['epoch'] + 1
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
         model.apply(weights_init.init_model)
         log = logger.Train_Logger(save_path,"train_log")
-        
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        start_epoch = 1
     common.print_network(model)
  
     loss = loss.DiceLoss()
@@ -86,7 +89,7 @@ if __name__ == '__main__':
     best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
     trigger = 0  # early stop 计数器
     alpha = 0.4 # 深监督衰减系数初始值
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(start_epoch, args.epochs + 1):
         common.adjust_learning_rate(optimizer, epoch, args)
         train_log = train(model, train_loader, optimizer, loss, args.n_labels, alpha)
         val_log = val(model, val_loader, loss, args.n_labels)
