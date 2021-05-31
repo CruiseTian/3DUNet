@@ -68,14 +68,15 @@ if __name__ == '__main__':
     val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False,collate_fn=Train_Dataset.collate_fn)
 
     # model info
+    model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
     if args.weight is not None:
-        model = torch.load(args.weight).to(device)
+        model_weight = torch.load(args.weight)['net']
+        model.load_state_dict(model_weight['net']).to(device)
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
-        model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
+        model.apply(weights_init.init_model)
         log = logger.Train_Logger(save_path,"train_log")
-
-    model.apply(weights_init.init_model)
+        
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     common.print_network(model)
  
