@@ -36,7 +36,7 @@ class Train_Dataset(dataset):
         label_array = torch.FloatTensor(label_array).unsqueeze(0)
 
         if self.transforms:
-            img_array = self.transforms(img_array)     
+            img_array, label_array = self.transforms(img_array, label_array)     
 
         return img_array, label_array.squeeze(0)
 

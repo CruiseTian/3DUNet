@@ -135,27 +135,27 @@ class Window:
         self.lower = lower
         self.upper = upper
 
-    def __call__(self, image):
+    def __call__(self, image, mask):
         image = np.clip(image, self.lower, self.upper)
 
-        return image
+        return image, mask
 
 class Normalize:
     def __init__(self, low, high):
         self.low = low
         self.high = high
 
-    def __call__(self, img):
+    def __call__(self, img, mask):
         img = (img - self.low) / (self.high - self.low)
         img = img * 2 - 1
-        return img
+        return img, mask
 
 
 class Compose:
     def __init__(self, transforms):
         self.transforms = transforms
 
-    def __call__(self, img):
+    def __call__(self, img, mask):
         for t in self.transforms:
-            img = t(img)
-        return img
+            img, mask = t(img, mask)
+        return img, mask
