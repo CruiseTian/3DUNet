@@ -5,7 +5,7 @@ import numpy as np
 import SimpleITK as sitk
 import torch
 from torch.utils.data import Dataset as dataset
-from .transforms import Window, Normalize, Compose
+from .transforms import Window, Normalize, Compose, RandomRotate
 
 class Train_Dataset(dataset):
     def __init__(self, args):
@@ -18,7 +18,8 @@ class Train_Dataset(dataset):
             for x in os.listdir(self.image_dir)])
         self.transforms = Compose([
                 Window(args.lower, args.upper),
-                Normalize(args.lower, args.upper)
+                Normalize(args.lower, args.upper),
+                RandomRotate()
             ])
 
     def __getitem__(self, index):

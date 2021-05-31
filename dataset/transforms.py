@@ -97,9 +97,9 @@ class RandomRotate:
         img = torch.rot90(img,cnt,[1,2])
         return img
 
-    def __call__(self, img, mask):
+    def __call__(self, img):
         cnt = random.randint(0,self.max_cnt)
-        return self._rotate(img, cnt), self._rotate(mask, cnt)
+        return self._rotate(img, cnt)
 
 
 class Center_Crop:
@@ -131,12 +131,12 @@ class ToTensor:
         return img, mask[None]
 
 class Window:
-    def __init__(self, window_min, window_max):
-        self.window_min = window_min
-        self.window_max = window_max
+    def __init__(self, lower, upper):
+        self.lower = lower
+        self.upper = upper
 
     def __call__(self, image):
-        image = np.clip(image, self.window_min, self.window_max)
+        image = np.clip(image, self.lower, self.upper)
 
         return image
 
