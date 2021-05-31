@@ -97,9 +97,9 @@ class RandomRotate:
         img = torch.rot90(img,cnt,[1,2])
         return img
 
-    def __call__(self, img):
+    def __call__(self, img, mask):
         cnt = random.randint(0,self.max_cnt)
-        return self._rotate(img, cnt)
+        return self._rotate(img, cnt), self._rotate(mask, cnt)
 
 
 class Center_Crop:
