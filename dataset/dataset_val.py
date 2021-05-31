@@ -10,7 +10,7 @@ import nibabel as nib
 from skimage.measure import regionprops
 from itertools import product
 
-class Train_Dataset(dataset):
+class Val_Dataset(dataset):
     def __init__(self, args):
 
         self.args = args

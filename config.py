@@ -27,7 +27,7 @@ parser.add_argument('--crop_size', type=int, default=64)
 # test
 parser.add_argument('--postprocess', type=bool, default=True, help='post process')
 parser.add_argument('--model_path', default='/content/gdrive/Shareddrives/课程实验/runs/best_model.pth',help='test model path')
-parser.add_argument("--pred_dir", required=True, default='/content/gdrive/Shareddrives/课程实验/predict', help="The directory for saving predictions.")
+parser.add_argument("--pred_dir", default='/content/gdrive/Shareddrives/课程实验/predict', help="The directory for saving predictions.")
 parser.add_argument('--test_data_path',default = '/content/gdrive/Shareddrives/课程实验/datasets/ribfrac-test-images/',help='Testset path')
 parser.add_argument("--prob_thresh", default=0.1, help="Prediction probability threshold.")
 parser.add_argument("--bone_thresh", default=300, help="Bone binarization threshold.")

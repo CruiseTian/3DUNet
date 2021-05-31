@@ -76,7 +76,7 @@ def _predict_single_image(model, dataloader, postprocess, prob_thresh,
         for _, sample in enumerate(dataloader):
             images, centers = sample
             images = images.cuda()
-            output = model(images).sigmoid().cpu().numpy().squeeze(axis=1)
+            output = model(images).sigmoid().cpu().numpy()
 
             for i in range(len(centers)):
                 center_x, center_y, center_z = centers[i]
@@ -118,15 +118,15 @@ def _make_submission_files(pred, image_id, affine):
 
 
 def predict(args):
-    batch_size = 16
-    num_workers = 0
+    batch_size = args.batch_size
     postprocess = True if args.postprocess == "True" else False
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model = UNet(1, args.n_labels)
+    model = UNet(1, args.n_labels).to(device)
     model.eval()
     if args.model_path is not None:
         model_weights = torch.load(args.model_path)
-        model.load_state_dict(model_weights)
+        model.load_state_dict(model_weights['net'])
 
     image_path_list = sorted([os.path.join(args.test_data_path, file)
         for file in os.listdir(args.test_data_path) if "nii" in file])
@@ -137,8 +137,7 @@ def predict(args):
     pred_info_list = []
     for image_id, image_path in zip(image_id_list, image_path_list):
         dataset = Test_Dataset(image_path, args)
-        dataloader = DataLoader(dataset, batch_size, num_workers=num_workers,
-            collate_fn=Test_Dataset.collate_fn)
+        dataloader = DataLoader(dataset, batch_size, collate_fn=Test_Dataset.collate_fn)
         pred_arr = _predict_single_image(model, dataloader, postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
         pred_image, pred_info = _make_submission_files(pred_arr, image_id,

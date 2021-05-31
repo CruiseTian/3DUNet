@@ -61,7 +61,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
 
 if __name__ == '__main__':
     args = config.args
-    save_path = os.path.join(args.save, 'runs')
+    save_path = os.path.join(args.save_path, 'runs')
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
@@ -86,8 +86,11 @@ if __name__ == '__main__':
  
     loss = loss.DiceLoss()
     # loss = SoftDiceLoss()
-
-    best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
+    
+    if log.log is not None:
+        best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
+    else:
+        best = [0,0]
     trigger = 0  # early stop 计数器
     alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(start_epoch, start_epoch + args.epochs):
