@@ -127,6 +127,7 @@ def predict(args):
     if args.model_path is not None:
         model_weights = torch.load(args.model_path)
         model.load_state_dict(model_weights['net'])
+    model = nn.DataParallel(model)
 
     image_path_list = sorted([os.path.join(args.test_data_path, file)
         for file in os.listdir(args.test_data_path) if "nii" in file])
@@ -137,7 +138,7 @@ def predict(args):
     pred_info_list = []
     for image_id, image_path in zip(image_id_list, image_path_list):
         dataset = Test_Dataset(image_path, args)
-        dataloader = DataLoader(dataset, batch_size, collate_fn=Test_Dataset.collate_fn)
+        dataloader = DataLoader(dataset, batch_size, num_workers=args.workers, collate_fn=Test_Dataset.collate_fn)
         pred_arr = _predict_single_image(model, dataloader, postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
         pred_image, pred_info = _make_submission_files(pred_arr, image_id,

@@ -41,10 +41,6 @@ def train(model, train_loader, optimizer, loss_func, n_labels):
 
     for idx, (data, target) in tqdm(enumerate(train_loader),total=len(train_loader)):
         data, target = data.float(), target.squeeze(1).long()
-        print(data.dtype)
-        print(data.shape)
-        print(target.dtype)
-        print(target.shape)
         target = common.to_one_hot_3d(target,n_labels)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -68,8 +64,8 @@ if __name__ == '__main__':
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # data info
-    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,shuffle=False,collate_fn=Train_Dataset.collate_fn)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,shuffle=False,collate_fn=Val_Dataset.collate_fn)
+    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.workers,shuffle=False,collate_fn=Train_Dataset.collate_fn)
+    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False,collate_fn=Val_Dataset.collate_fn)
 
     # model info
     model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
@@ -86,6 +82,7 @@ if __name__ == '__main__':
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         start_epoch = 1
     common.print_network(model)
+    model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
  
     loss = loss.DiceLoss()
     # loss = loss.TverskyLoss()
