@@ -83,8 +83,8 @@ if __name__ == '__main__':
         start_epoch = 1
     common.print_network(model)
  
-    loss = loss.DiceLoss()
-    # loss = SoftDiceLoss()
+    # loss = loss.DiceLoss()
+    loss = loss.TverskyLoss()
     
     if log.log is not None:
         best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
