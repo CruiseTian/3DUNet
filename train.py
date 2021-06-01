@@ -72,8 +72,7 @@ if __name__ == '__main__':
     if args.weight is not None:
         checkpoint = torch.load(args.weight)
 
-        model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
-        model.load_state_dict(checkpoint['net'])
+        model.module.load_state_dict(checkpoint['net'])
 
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         optimizer.load_state_dict(checkpoint['optimizer'])
@@ -82,11 +81,12 @@ if __name__ == '__main__':
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
         model.apply(weights_init.init_model)
-        model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
+        # model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
         log = logger.Train_Logger(save_path,"train_log")
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         start_epoch = 1
     common.print_network(model)
+    model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
     model.to(device)
  
     loss = loss.DiceLoss()
