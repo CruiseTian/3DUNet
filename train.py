@@ -61,8 +61,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels):
 if __name__ == '__main__':
     args = config.args
     gpu_list = args.gpu_id
-    gpu_list_str = ','.join(map(str, gpu_list))
-    os.environ.setdefault("CUDA_VISIBLE_DEVICES", gpu_list_str)
+    os.environ.setdefault("CUDA_VISIBLE_DEVICES", gpu_list)
     save_path = os.path.join(args.save_path, 'runs')
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
