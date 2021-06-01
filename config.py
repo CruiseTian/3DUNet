@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser(description='Hyper-parameters management')
 # Hardware options
 parser.add_argument('--workers', type=int, default=4,help='number of threads for data loading')
 parser.add_argument('--seed', type=int, default=2021, help='random seed')
-parser.add_argument('--gpu_id', type=list,default=[2,3], help='multi-GPU')
+parser.add_argument('--gpu_id', type=list,default=[0,1], help='multi-GPU')
 
 # Preprocess parameters
 parser.add_argument('--weight', type=str, default=None, help='model init weight')
