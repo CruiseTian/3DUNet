@@ -73,7 +73,7 @@ if __name__ == '__main__':
     if args.weight is not None:
         checkpoint = torch.load(args.weight)
 
-        model.module.load_state_dict(checkpoint['net'])
+        model.load_state_dict(checkpoint['net'])
 
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         optimizer.load_state_dict(checkpoint['optimizer'])
