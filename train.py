@@ -62,7 +62,7 @@ if __name__ == '__main__':
     args = config.args
     save_path = os.path.join(args.save_path, 'runs')
     if not os.path.exists(save_path): os.makedirs(save_path)
-    device = torch.device("cuda:{}".format("2,3") if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
     train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.workers,shuffle=False,collate_fn=Train_Dataset.collate_fn)
     val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False,collate_fn=Val_Dataset.collate_fn)
