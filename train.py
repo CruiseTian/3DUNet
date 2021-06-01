@@ -31,10 +31,9 @@ def val(model, val_loader, loss_func, n_labels):
             val_loss.update(loss.item(),data.size(0))
             val_dice.update(output, target)
     val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_liver': val_dice.avg[1]})
-    if n_labels==3: val_log.update({'Val_dice_tumor': val_dice.avg[2]})
     return val_log
 
-def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
+def train(model, train_loader, optimizer, loss_func, n_labels):
     print("=======Epoch:{}=======lr:{}".format(epoch,optimizer.state_dict()['param_groups'][0]['lr']))
     model.train()
     train_loss = metrics.LossAverage()
@@ -92,10 +91,9 @@ if __name__ == '__main__':
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
-    alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(start_epoch, start_epoch + args.epochs):
         common.adjust_learning_rate(optimizer, epoch, args)
-        train_log = train(model, train_loader, optimizer, loss, args.n_labels, alpha)
+        train_log = train(model, train_loader, optimizer, loss, args.n_labels)
         val_log = val(model, val_loader, loss, args.n_labels)
         log.update(epoch,train_log,val_log)
 
@@ -110,9 +108,6 @@ if __name__ == '__main__':
             best[1] = val_log['Val_dice_liver']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
-
-        # 深监督系数衰减
-        if epoch % 30 == 0: alpha *= 0.8
 
         # early stopping
         if args.early_stop is not None:

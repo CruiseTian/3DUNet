@@ -118,7 +118,7 @@ def _make_submission_files(pred, image_id, affine):
 
 
 def predict(args):
-    batch_size = args.batch_size
+    batch_size = 1
     postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
