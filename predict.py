@@ -122,12 +122,12 @@ def predict(args):
     postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model = UNet(1, args.n_labels).to(device)
+    model = UNet(1, args.n_labels)
     model.eval()
     if args.model_path is not None:
         model_weights = torch.load(args.model_path)
         model.load_state_dict(model_weights['net'])
-    model = nn.DataParallel(model)
+    model = nn.DataParallel(model).cuda()
 
     image_path_list = sorted([os.path.join(args.test_data_path, file)
         for file in os.listdir(args.test_data_path) if "nii" in file])

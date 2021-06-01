@@ -68,7 +68,7 @@ if __name__ == '__main__':
     val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False,collate_fn=Val_Dataset.collate_fn)
 
     # model info
-    model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
+    model = UNet(in_channels=1, out_channels=args.n_labels)
     if args.weight is not None:
         checkpoint = torch.load(args.weight)
         model.load_state_dict(checkpoint['net'])
@@ -83,6 +83,7 @@ if __name__ == '__main__':
         start_epoch = 1
     common.print_network(model)
     model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
+    model.to(device)
  
     loss = loss.DiceLoss()
     # loss = loss.TverskyLoss()
