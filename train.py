@@ -118,7 +118,7 @@ if __name__ == '__main__':
                 break
         torch.cuda.empty_cache() 
 
-    ax = log.log.plot(x='epoch', y='Val_dice_liver', grid=True, title='Val_dice_liver')
-    fig = ax.get_figure()
-    fig.savefig(os.path.join(save_path, 'fig.png'))
-    plt.show()   
+        ax = log.log.plot(x='epoch', y='Val_dice_liver', grid=True, title='Val_dice_liver')
+        fig = ax.get_figure()
+        fig.savefig(os.path.join(save_path, 'fig.png'))
+        plt.show()   
