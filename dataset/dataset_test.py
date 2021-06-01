@@ -45,12 +45,6 @@ class Test_Dataset(dataset):
 
         return patch
 
-    def _apply_transforms(self, image):
-        for t in self.transforms:
-            image = t(image)
-
-        return image
-
     def __getitem__(self, idx):
         image = self._crop_patch(idx)
         center = self.centers[idx]

@@ -126,12 +126,6 @@ class Val_Dataset(dataset):
 
         return roi
 
-    def _apply_transforms(self, image):
-        for t in self.transforms:
-            image = t(image)
-
-        return image
-
     def __getitem__(self, index):
         file_prefix = self.files_prefix[index]
         # read image and label
