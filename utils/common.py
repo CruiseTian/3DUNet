@@ -5,7 +5,7 @@ import torch, random
 
 # target one-hot编码
 def to_one_hot_3d(tensor, n_classes=2):  # shape = [batch, s, h, w]
-    n, s, h, w = tensor.squeeze(1).size()
+    n, s, h, w = tensor.size()
     one_hot = torch.zeros(n, n_classes, s, h, w).scatter_(1, tensor.view(n, 1, s, h, w), 1)
     return one_hot
 
