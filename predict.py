@@ -122,12 +122,12 @@ def predict(args):
     postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model = UNet(1, args.n_labels)
+    model = UNet(1, args.n_labels).to(device)
     model.eval()
     if args.model_path is not None:
-        model_weights = torch.load(args.model_path)
-        model.load_state_dict(model_weights['net'])
-    model = nn.DataParallel(model).cuda()
+        checkpoint = torch.load(args.model_path)
+        model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
+        model.load_state_dict(checkpoint['net'])
 
     image_path_list = sorted([os.path.join(args.test_data_path, file)
         for file in os.listdir(args.test_data_path) if "nii" in file])
