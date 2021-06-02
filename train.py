@@ -22,7 +22,7 @@ def val(model, val_loader, loss_func, n_labels):
     val_dice = metrics.DiceAverage(n_labels)
     with torch.no_grad():
         for idx,(data, target) in tqdm(enumerate(val_loader),total=len(val_loader)):
-            data, target = data.float(), target.squeeze(1).long()
+            data, target = data.float(), target.long()
             target = common.to_one_hot_3d(target, n_labels)
             data, target = data.to(device), target.to(device)
             output = model(data)
@@ -40,7 +40,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels):
     train_dice = metrics.DiceAverage(n_labels)
 
     for idx, (data, target) in tqdm(enumerate(train_loader),total=len(train_loader)):
-        data, target = data.float(), target.squeeze(1).long()
+        data, target = data.float(), target.long()
         target = common.to_one_hot_3d(target,n_labels)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
@@ -60,7 +60,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels):
 
 if __name__ == '__main__':
     args = config.args
-    save_path = os.path.join(args.save_path, 'runs')
+    save_path = os.path.join('./runs', args.save_path)
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
@@ -82,12 +82,10 @@ if __name__ == '__main__':
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
         model.apply(weights_init.init_model)
-        # model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
         log = logger.Train_Logger(save_path,"train_log")
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         start_epoch = 1
     common.print_network(model)
-    # model.to(device)
  
     loss = loss.DiceLoss()
     # loss = loss.TverskyLoss()
@@ -124,5 +122,9 @@ if __name__ == '__main__':
 
         ax = log.log.plot(x='epoch', y='Val_dice_liver', grid=True, title='Val_dice_liver')
         fig = ax.get_figure()
-        fig.savefig(os.path.join(save_path, 'fig.png'))
-        plt.show()   
+        fig.savefig(os.path.join(save_path, 'dice.png'))
+        # plt.show()   
+        ax = log.log.plot(x='epoch', y='Val_Loss', grid=True, title='Val_Loss')
+        fig = ax.get_figure()
+        fig.savefig(os.path.join(save_path, 'loss.png'))
+        # plt.show() 
