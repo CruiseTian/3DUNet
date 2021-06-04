@@ -103,7 +103,7 @@ if __name__ == '__main__':
     alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(start_epoch, start_epoch + args.epochs):
         common.adjust_learning_rate(optimizer, epoch, args)
-        train_log = train(model, train_loader, optimizer, loss, args.n_labels)
+        train_log = train(model, train_loader, optimizer, loss, args.n_labels, alpha)
         val_log = val(model, val_loader, loss, args.n_labels)
         log.update(epoch,train_log,val_log)
 
