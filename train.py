@@ -11,7 +11,7 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 import config
-from model.3DUNet import UNet
+from model.UNet3d import UNet
 from dataset.dataset_val import Val_Dataset
 from dataset.dataset_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False,collate_fn=Val_Dataset.collate_fn)
 
     # model info
-    model = UNet(in_channels=1, out_channels=args.n_labels).to(device)
+    model = UNet(1, args.n_labels).to(device)
     model = torch.nn.DataParallel(model, device_ids=args.gpu_id)  # multi-GPU
     if args.weight is not None:
         checkpoint = torch.load(args.weight)
