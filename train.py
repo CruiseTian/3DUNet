@@ -11,7 +11,7 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 import config
-from model.UNet import UNet
+from model.3DUNet import UNet
 from dataset.dataset_val import Val_Dataset
 from dataset.dataset_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
@@ -33,7 +33,7 @@ def val(model, val_loader, loss_func, n_labels):
     val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_liver': val_dice.avg[1]})
     return val_log
 
-def train(model, train_loader, optimizer, loss_func, n_labels):
+def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
     print("=======Epoch:{}=======lr:{}".format(epoch,optimizer.state_dict()['param_groups'][0]['lr']))
     model.train()
     train_loss = metrics.LossAverage()
@@ -46,12 +46,17 @@ def train(model, train_loader, optimizer, loss_func, n_labels):
         optimizer.zero_grad()
 
         output = model(data)
-        loss = loss_func(output, target)
+        output = model(data)
+        loss0 = loss_func(output[0], target)
+        loss1 = loss_func(output[1], target)
+        loss2 = loss_func(output[2], target)
+        loss3 = loss_func(output[3], target)
 
+        loss = loss3  +  alpha * (loss0 + loss1 + loss2)
         loss.backward()
         optimizer.step()
         
-        train_loss.update(loss.item(),data.size(0))
+        train_loss.update(loss3.item(),data.size(0))
         train_dice.update(output, target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_liver': train_dice.avg[1]})
@@ -95,6 +100,7 @@ if __name__ == '__main__':
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
+    alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(start_epoch, start_epoch + args.epochs):
         common.adjust_learning_rate(optimizer, epoch, args)
         train_log = train(model, train_loader, optimizer, loss, args.n_labels)
@@ -112,6 +118,9 @@ if __name__ == '__main__':
             best[1] = val_log['Val_dice_liver']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
+
+        # 深监督系数衰减
+        if epoch % 30 == 0: alpha *= 0.8
 
         # early stopping
         if args.early_stop is not None:
