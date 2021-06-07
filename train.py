@@ -46,7 +46,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         optimizer.zero_grad()
 
         output = model(data)
-        output = model(data)
+        # output = model(data)
         loss0 = loss_func(output[0], target)
         loss1 = loss_func(output[1], target)
         loss2 = loss_func(output[2], target)
