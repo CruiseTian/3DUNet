@@ -11,7 +11,7 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 import config
-from model.UNet import UNet
+from model.UNet3d import UNet
 from dataset.dataset_val import Val_Dataset
 from dataset.dataset_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
