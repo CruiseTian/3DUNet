@@ -6,6 +6,11 @@ parser = argparse.ArgumentParser(description='Hyper-parameters management')
 parser.add_argument('--workers', type=int, default=4,help='number of threads for data loading')
 parser.add_argument('--seed', type=int, default=2021, help='random seed')
 parser.add_argument('--gpu_id', type=list,default=[0,1], help='multi-GPU')
+parser.add_argument('--norm_factor', type=float, default=200.0, help='')
+parser.add_argument('--expand_slice', type=int, default=20, help='')
+parser.add_argument('--min_slices', type=int, default=48, help='')
+parser.add_argument('--xy_down_scale', type=float, default=0.25, help='')
+parser.add_argument('--slice_down_scale', type=float, default=2.0, help='')
 
 # Preprocess parameters
 parser.add_argument('--weight', type=str, default=None, help='model init weight')
