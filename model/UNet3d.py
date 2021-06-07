@@ -41,8 +41,9 @@ class UNet(nn.Module):
         # 32*32 尺度下的映射
         self.map1 = nn.Sequential(
             nn.Conv3d(256, out_channel, 1, 1),
-            nn.Upsample(scale_factor=(16, 32, 32), mode='trilinear'),
-            # nn.Softmax(dim =1)
+            # nn.Upsample(scale_factor=(16, 32, 32), mode='trilinear'),
+            nn.Upsample(scale_factor=(16, 16,16), mode='trilinear'),
+            nn.Softmax(dim =1)
         )
 
     def forward(self, x):
@@ -60,10 +61,7 @@ class UNet(nn.Module):
         # t2 = out
         # out = F.relu(F.interpolate(self.decoder1(out),scale_factor=(2,2,2),mode ='trilinear'))
         # print(out.shape,t4.shape)
-        print(out.shape)
         output1 = self.map1(out)
-        print(output1.shape)
-        output1 = nn.Softmax(output1,dim =1)
         out = F.relu(F.interpolate(self.decoder2(out),scale_factor=(2,2,2),mode ='trilinear'))
         out = torch.add(out,t3)
         output2 = self.map2(out)
