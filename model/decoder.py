@@ -49,6 +49,7 @@ class DecoderBlock(nn.Module):
         """
         for k, op in self.module_dict.items():
             if k.startswith("deconv"):
+                print(x.shape)
                 x = op(x)
                 x = torch.cat((down_sampling_features[int(k[-1])], x), dim=1)
             elif k.startswith("conv"):
