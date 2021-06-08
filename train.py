@@ -58,7 +58,8 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         optimizer.step()
         
         train_loss.update(loss.item(),data.size(0))
-        train_dice.update(output[2], target)
+        # train_dice.update(output[2], target)
+        train_dice.update(output, target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
     return val_log
