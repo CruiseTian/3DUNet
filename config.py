@@ -9,8 +9,8 @@ parser.add_argument('--gpu_id', type=list,default=[0,1], help='multi-GPU')
 parser.add_argument('--norm_factor', type=float, default=200.0, help='')
 parser.add_argument('--expand_slice', type=int, default=20, help='')
 parser.add_argument('--min_slices', type=int, default=48, help='')
-parser.add_argument('--xy_down_scale', type=float, default=0.25, help='')
-parser.add_argument('--slice_down_scale', type=float, default=2.0, help='')
+parser.add_argument('--xy_down_scale', type=float, default=0.5, help='')
+parser.add_argument('--slice_down_scale', type=float, default=1.0, help='')
 
 # Preprocess parameters
 parser.add_argument('--weight', type=str, default=None, help='model init weight')
@@ -19,7 +19,7 @@ parser.add_argument('--upper', type=int, default=1000, help='')
 parser.add_argument('--lower', type=int, default=-200, help='')
 
 # data in/out and dataset
-parser.add_argument('--dataset_path',default = './datasets/process',help='fixed trainset root path')
+parser.add_argument('--dataset_path',default = './datasets/process2',help='fixed trainset root path')
 parser.add_argument('--save_path',default='ex1',help='save path of trained model')
 parser.add_argument('--batch_size', type=list, default=2,help='batch size of trainset')
 

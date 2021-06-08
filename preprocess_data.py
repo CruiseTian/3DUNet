@@ -130,7 +130,7 @@ class LITS_preprocess:
 
 if __name__ == '__main__':
     raw_dataset_path = './datasets/'
-    fixed_dataset_path = './datasets/process/'
+    fixed_dataset_path = './datasets/process2/'
 
     args = config.args 
     tool = LITS_preprocess(raw_dataset_path,fixed_dataset_path, args)
