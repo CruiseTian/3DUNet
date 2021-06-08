@@ -93,7 +93,7 @@ if __name__ == '__main__':
         start_epoch = checkpoint['epoch'] + 1
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
-        model.apply(weights_init.init_model)
+        # model.apply(weights_init.init_model)
         log = logger.Train_Logger(save_path,"train_log")
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         start_epoch = 1
