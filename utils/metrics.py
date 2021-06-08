@@ -46,7 +46,9 @@ class DiceAverage(object):
         dices = []
         for class_index in range(targets.size()[1]):
             inter = torch.sum(logits[:, class_index, :, :, :] * targets[:, class_index, :, :, :])
+            print("inter:", inter)
             union = torch.sum(logits[:, class_index, :, :, :]) + torch.sum(targets[:, class_index, :, :, :])
+            print("union:", union)
             dice = (2. * inter + 1) / (union + 1)
             dices.append(dice.item())
         return np.asarray(dices)
