@@ -39,16 +39,17 @@ class DiceAverage(object):
         self.sum += self.value
         self.count += 1
         self.avg = np.around(self.sum / self.count, 4)
-        # print(self.value)
+        print("value:",self.value)
+        print("avg:", self.avg)
 
     @staticmethod
     def get_dices(logits, targets):
         dices = []
         for class_index in range(targets.size()[1]):
             inter = torch.sum(logits[:, class_index, :, :, :] * targets[:, class_index, :, :, :])
-            print("inter:", inter)
+            print("inter:", inter.item())
             union = torch.sum(logits[:, class_index, :, :, :]) + torch.sum(targets[:, class_index, :, :, :])
-            print("union:", union)
+            print("union:", union.item())
             dice = (2. * inter + 1) / (union + 1)
             dices.append(dice.item())
         return np.asarray(dices)
