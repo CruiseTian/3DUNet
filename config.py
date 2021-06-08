@@ -28,6 +28,7 @@ parser.add_argument('--epochs', type=int, default=200, metavar='N',help='number 
 parser.add_argument('--lr', type=float, default=0.001, metavar='LR',help='learning rate (default: 0.001)')
 parser.add_argument('--early-stop', default=30, type=int, help='early stopping (default: 30)')
 parser.add_argument('--crop_size', type=int, default=64)
+parser.add_argument('--val_crop_max_size', type=int, default=96)
 
 # test
 parser.add_argument('--postprocess', type=bool, default=True, help='post process')
