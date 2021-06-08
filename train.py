@@ -11,7 +11,7 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 import config
-from model.UNet import UNet
+from model.UNet3d import UNet
 from dataset.dataset_val import Val_Dataset
 from dataset.dataset_train import Train_Dataset
 from utils import loss, logger, metrics, common, weights_init
@@ -45,21 +45,21 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
-        output = model(data)
-        loss = loss_func(output, target)
         # output = model(data)
-        # loss0 = loss_func(output[0], target)
-        # loss1 = loss_func(output[1], target)
-        # loss2 = loss_func(output[2], target)
-        # loss3 = loss_func(output[3], target)
+        # loss = loss_func(output, target)
+        output = model(data)
+        loss0 = loss_func(output[0], target)
+        loss1 = loss_func(output[1], target)
+        loss2 = loss_func(output[2], target)
+        loss3 = loss_func(output[3], target)
 
-        # loss = loss2  +  alpha * (loss0 + loss1)
+        loss = loss3  +  alpha * (loss0 + loss1 + loss2)
         loss.backward()
         optimizer.step()
         
-        train_loss.update(loss.item(),data.size(0))
-        # train_dice.update(output[2], target)
-        train_dice.update(output, target)
+        train_loss.update(loss3.item(),data.size(0))
+        train_dice.update(output[3], target)
+        # train_dice.update(output, target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
     return val_log
