@@ -19,7 +19,7 @@ parser.add_argument('--upper', type=int, default=1000, help='')
 parser.add_argument('--lower', type=int, default=-200, help='')
 
 # data in/out and dataset
-parser.add_argument('--dataset_path',default = './datasets',help='fixed trainset root path')
+parser.add_argument('--dataset_path',default = './datasets/process',help='fixed trainset root path')
 parser.add_argument('--save_path',default='ex1',help='save path of trained model')
 parser.add_argument('--batch_size', type=list, default=2,help='batch size of trainset')
 

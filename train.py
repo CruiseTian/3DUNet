@@ -30,7 +30,7 @@ def val(model, val_loader, loss_func, n_labels):
             
             val_loss.update(loss.item(),data.size(0))
             val_dice.update(output, target)
-    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_liver': val_dice.avg[1]})
+    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_frac': val_dice.avg[1]})
     return val_log
 
 def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
@@ -59,7 +59,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         train_loss.update(loss3.item(),data.size(0))
         train_dice.update(output[3], target)
 
-    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_liver': train_dice.avg[1]})
+    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
     return val_log
 
 
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # data info
-    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.workers,shuffle=False,collate_fn=Train_Dataset.collate_fn)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False,collate_fn=Val_Dataset.collate_fn)
+    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.workers,shuffle=True)
+    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False)
 
     # model info
     model = UNet(1, args.n_labels).to(device)
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     # loss = loss.TverskyLoss()
     
     if log.log is not None:
-        best = [log.log.idxmax()['Val_dice_liver']+1, log.log.max()['Val_dice_liver']]
+        best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
@@ -111,11 +111,11 @@ if __name__ == '__main__':
         state = {'net': model.state_dict(),'optimizer':optimizer.state_dict(),'epoch': epoch}
         torch.save(state, os.path.join(save_path, 'latest_model.pth'))
         trigger += 1
-        if val_log['Val_dice_liver'] > best[1]:
+        if val_log['Val_dice_frac'] > best[1]:
             print('Saving best model')
             torch.save(state, os.path.join(save_path, 'best_model.pth'))
             best[0] = epoch
-            best[1] = val_log['Val_dice_liver']
+            best[1] = val_log['Val_dice_frac']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
 
@@ -129,7 +129,7 @@ if __name__ == '__main__':
                 break
         torch.cuda.empty_cache() 
 
-        ax = log.log.plot(x='epoch', y='Val_dice_liver', grid=True, title='Val_dice_liver')
+        ax = log.log.plot(x='epoch', y='Val_dice_frac', grid=True, title='Val_dice_frac')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'dice.png'))
         # plt.show()   
