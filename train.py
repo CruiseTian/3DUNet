@@ -41,7 +41,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
 
     for idx, (data, target) in tqdm(enumerate(train_loader),total=len(train_loader)):
         data, target = data.float(), target.long()
-        # target = common.to_one_hot_3d(target,n_labels)
+        target = common.to_one_hot_3d(target,n_labels)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
@@ -95,8 +95,8 @@ if __name__ == '__main__':
     common.print_network(model)
  
     # loss = loss.DiceLoss()
-    # loss = loss.TverskyLoss()
-    loss = nn.CrossEntropyLoss()
+    loss = loss.TverskyLoss()
+    # loss = nn.CrossEntropyLoss()
     
     if log.log is not None:
         best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
