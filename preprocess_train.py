@@ -66,10 +66,8 @@ class LITS_preprocess:
         # 降采样，（对x和y轴进行降采样，slice轴的spacing归一化到slice_down_scale）
         ct_array = ndimage.zoom(ct_array, (ct.GetSpacing()[-1] / self.slice_down_scale, self.xy_down_scale, self.xy_down_scale), order=3)
         seg_array = ndimage.zoom(seg_array, (ct.GetSpacing()[-1] / self.slice_down_scale, self.xy_down_scale, self.xy_down_scale), order=0)
-        print(seg_array.shape)
         # 找到肝脏区域开始和结束的slice，并各向外扩张
         z = np.any(seg_array, axis=(1, 2))
-        print(z.shape)
         start_slice, end_slice = np.where(z)[0][[0, -1]]
 
         # 两个方向上各扩张个slice

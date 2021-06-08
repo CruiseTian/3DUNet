@@ -94,8 +94,9 @@ if __name__ == '__main__':
         start_epoch = 1
     common.print_network(model)
  
-    loss = loss.DiceLoss()
+    # loss = loss.DiceLoss()
     # loss = loss.TverskyLoss()
+    loss = nn.CrossEntropyLoss()
     
     if log.log is not None:
         best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
