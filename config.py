@@ -2,13 +2,13 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Hyper-parameters management')
 
-parser.add_argument("--train_image_dir", default = './datasets/ribfrac-train-images/',
+parser.add_argument("--train_image_dir", default = '../unet/datasets/ribfrac-train-images/',
     help="The training image nii directory.")
-parser.add_argument("--train_label_dir", default = './datasets/ribfrac-train-labels/',
+parser.add_argument("--train_label_dir", default = '../unet/datasets/ribfrac-train-labels/',
     help="The training label nii directory.")
-parser.add_argument("--val_image_dir", default = './datasets/ribfrac-val-images/',
+parser.add_argument("--val_image_dir", default = '../unet/datasets/ribfrac-val-images/',
     help="The validation image nii directory.")
-parser.add_argument("--val_label_dir", default = './datasets/ribfrac-val-labels/',
+parser.add_argument("--val_label_dir", default = '../unet/datasets/ribfrac-val-labels/',
     help="The validation label nii directory.")
 parser.add_argument("--save_model", default=True,
     help="Whether to save the trained model.")
