@@ -20,32 +20,32 @@ class UNet(nn.Module):
         
         self.map4 = nn.Sequential(
             nn.Conv3d(2, out_channel, 1, 1),
-            nn.Upsample(scale_factor=(1, 2, 2), mode='trilinear'),
-            # nn.Upsample(scale_factor=(1, 1, 1), mode='trilinear'),
+            # nn.Upsample(scale_factor=(1, 2, 2), mode='trilinear'),
+            nn.Upsample(scale_factor=(0.5, 1, 1), mode='trilinear'),
             nn.Softmax(dim =1)
         )
 
         # 128*128 尺度下的映射
         self.map3 = nn.Sequential(
             nn.Conv3d(64, out_channel, 1, 1),
-            nn.Upsample(scale_factor=(4, 8, 8), mode='trilinear'),
-            # nn.Upsample(scale_factor=(4, 4, 4), mode='trilinear'),
+            # nn.Upsample(scale_factor=(4, 8, 8), mode='trilinear'),
+            nn.Upsample(scale_factor=(2, 4, 4), mode='trilinear'),
             nn.Softmax(dim =1)
         )
 
         # 64*64 尺度下的映射
         self.map2 = nn.Sequential(
             nn.Conv3d(128, out_channel, 1, 1),
-            nn.Upsample(scale_factor=(8, 16, 16), mode='trilinear'),
-            # nn.Upsample(scale_factor=(8, 8, 8), mode='trilinear'),
+            # nn.Upsample(scale_factor=(8, 16, 16), mode='trilinear'),
+            nn.Upsample(scale_factor=(4, 8, 8), mode='trilinear'),
             nn.Softmax(dim =1)
         )
 
         # 32*32 尺度下的映射
         self.map1 = nn.Sequential(
             nn.Conv3d(256, out_channel, 1, 1),
-            nn.Upsample(scale_factor=(16, 32, 32), mode='trilinear'),
-            # nn.Upsample(scale_factor=(16, 16, 16), mode='trilinear'),
+            # nn.Upsample(scale_factor=(16, 32, 32), mode='trilinear'),
+            nn.Upsample(scale_factor=(8, 16, 16), mode='trilinear'),
             nn.Softmax(dim =1)
         )
 
