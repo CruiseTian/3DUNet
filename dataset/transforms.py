@@ -155,7 +155,7 @@ class Compose:
     def __init__(self, transforms):
         self.transforms = transforms
 
-    def __call__(self, img):
+    def __call__(self, img, mask):
         for t in self.transforms:
-            img = t(img)
-        return img
+            img, mask = t(img, mask)
+        return img, mask
