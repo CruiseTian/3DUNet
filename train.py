@@ -50,14 +50,14 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         loss0 = loss_func(output[0], target)
         loss1 = loss_func(output[1], target)
         loss2 = loss_func(output[2], target)
-        loss3 = loss_func(output[3], target)
+        # loss3 = loss_func(output[3], target)
 
-        loss = loss3  +  alpha * (loss0 + loss1 + loss2)
+        loss = loss2  +  alpha * (loss0 + loss1)
         loss.backward()
         optimizer.step()
         
-        train_loss.update(loss3.item(),data.size(0))
-        train_dice.update(output[3], target)
+        train_loss.update(loss2.item(),data.size(0))
+        train_dice.update(output[2], target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
     return val_log
@@ -127,13 +127,13 @@ if __name__ == '__main__':
             if trigger >= args.early_stop:
                 print("=> early stopping")
                 break
-        torch.cuda.empty_cache() 
+        torch.cuda.empty_cache()
 
         ax = log.log.plot(x='epoch', y='Val_dice_frac', grid=True, title='Val_dice_frac')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'dice.png'))
-        # plt.show()   
+        # plt.show()
         ax = log.log.plot(x='epoch', y='Val_Loss', grid=True, title='Val_Loss')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'loss.png'))
-        # plt.show() 
+        # plt.show()
