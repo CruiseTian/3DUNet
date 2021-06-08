@@ -12,9 +12,10 @@ import matplotlib.pyplot as plt
 
 import config
 from model.UNet3d import UNet
-from dataset.dataset_val import Val_Dataset
-from dataset.dataset_train import Train_Dataset
+from dataset.fracnet_dataset import FracNetTrainDataset
+from dataset import transforms as tsfm
 from utils import loss, logger, metrics, common, weights_init
+from utils.losses import MixLoss, DiceLoss
 
 def val(model, val_loader, loss_func, n_labels):
     model.eval()
@@ -45,20 +46,14 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
-        # output = model(data)
-        # loss = loss_func(output, target)
         output = model(data)
-        loss0 = loss_func(output[0], target)
-        loss1 = loss_func(output[1], target)
-        loss2 = loss_func(output[2], target)
-        loss3 = loss_func(output[3], target)
+        loss = loss_func(output, target)
 
-        loss = loss3  +  alpha * (loss0 + loss1 + loss2)
         loss.backward()
         optimizer.step()
         
-        train_loss.update(loss3.item(),data.size(0))
-        train_dice.update(output[3], target)
+        train_loss.update(loss.item(),data.size(0))
+        train_dice.update(output, target)
         # train_dice.update(output, target)
 
     val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
@@ -70,9 +65,19 @@ if __name__ == '__main__':
     save_path = os.path.join('./runs', args.save_path)
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    transforms = [
+        tsfm.Window(-200, 1000),
+        tsfm.MinMaxNorm(-200, 1000)
+    ]
     # data info
-    train_loader = DataLoader(dataset=Train_Dataset(args),batch_size=args.batch_size,num_workers=args.workers,shuffle=True)
-    val_loader = DataLoader(dataset=Val_Dataset(args),batch_size=1,num_workers=args.workers,shuffle=False)
+    ds_train = FracNetTrainDataset(args.train_image_dir, args.train_label_dir,
+        transforms=transforms)
+    train_loader = FracNetTrainDataset.get_dataloader(ds_train, args.batch_size, False,
+        args.workers)
+    ds_val = FracNetTrainDataset(args.val_image_dir, args.val_label_dir,
+        transforms=transforms)
+    val_loader = FracNetTrainDataset.get_dataloader(ds_val, args.batch_size, False,
+        args.workers)
 
     # model info
     model = UNet(1, args.n_labels).to(device)
@@ -95,7 +100,7 @@ if __name__ == '__main__':
     common.print_network(model)
  
     # loss = loss.DiceLoss()
-    loss = loss.TverskyLoss()
+    loss = MixLoss(nn.BCEWithLogitsLoss(), 0.5, DiceLoss(), 1)
     # loss = nn.CrossEntropyLoss()
     
     if log.log is not None:

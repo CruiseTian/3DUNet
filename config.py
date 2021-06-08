@@ -2,15 +2,19 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Hyper-parameters management')
 
+parser.add_argument("--train_image_dir", default = './datasets/ribfrac-train-images/',
+    help="The training image nii directory.")
+parser.add_argument("--train_label_dir", default = './datasets/ribfrac-train-labels/',
+    help="The training label nii directory.")
+parser.add_argument("--val_image_dir", default = './datasets/ribfrac-val-images/',
+    help="The validation image nii directory.")
+parser.add_argument("--val_label_dir", default = './datasets/ribfrac-val-labels/',
+    help="The validation label nii directory.")
+parser.add_argument("--save_model", default=True,
+    help="Whether to save the trained model.")
 # Hardware options
 parser.add_argument('--workers', type=int, default=4,help='number of threads for data loading')
-parser.add_argument('--seed', type=int, default=2021, help='random seed')
 parser.add_argument('--gpu_id', type=list,default=[0,1], help='multi-GPU')
-parser.add_argument('--norm_factor', type=float, default=200.0, help='')
-parser.add_argument('--expand_slice', type=int, default=20, help='')
-parser.add_argument('--min_slices', type=int, default=48, help='')
-parser.add_argument('--xy_down_scale', type=float, default=0.5, help='')
-parser.add_argument('--slice_down_scale', type=float, default=1.0, help='')
 
 # Preprocess parameters
 parser.add_argument('--weight', type=str, default=None, help='model init weight')
