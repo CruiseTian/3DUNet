@@ -64,7 +64,7 @@ class DiceAverage(object):
     def get_froc(logits, targets):
         # froc = []
         predict = np.array(list(np.where(logits.cpu().detach().numpy() < 0.5, 0, 1)[:])).astype(dtype=int)
-        targets = np.array(targets).astype(dtype=int)
+        targets = np.array(targets.cpu().detach().numpy()).astype(dtype=int)
 
         TN = np.array(targets[predict == 0] == 0).sum()
         FP = np.array(targets[predict == 1] == 0).sum()
