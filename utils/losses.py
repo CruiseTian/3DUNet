@@ -20,7 +20,7 @@ class MixLoss(nn.Module):
                 lf.append(v)
             else:
                 lfw.append(v)
-        mx = sum([w * l(x.float(), y.float()) for l, w in zip(lf, lfw)])
+        mx = sum([w * l(x, y) for l, w in zip(lf, lfw)])
         return mx
 
 
