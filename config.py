@@ -14,7 +14,7 @@ parser.add_argument("--save_model", default=True,
     help="Whether to save the trained model.")
 # Hardware options
 parser.add_argument('--workers', type=int, default=4,help='number of threads for data loading')
-parser.add_argument('--gpu_id', type=list,default=[0,1], help='multi-GPU')
+parser.add_argument('--gpu_id', type=list,default=[0,1,2,3], help='multi-GPU')
 
 # Preprocess parameters
 parser.add_argument('--weight', type=str, default=None, help='model init weight')
