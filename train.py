@@ -42,7 +42,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
 
     for idx, (data, target) in tqdm(enumerate(train_loader),total=len(train_loader)):
         data, target = data.float(), target.long()
-        target = common.to_one_hot_3d(target,n_labels)
+        # target = common.to_one_hot_3d(target,n_labels)
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
