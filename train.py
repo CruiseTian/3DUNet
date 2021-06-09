@@ -31,7 +31,7 @@ def val(model, val_loader, loss_func, n_labels):
             
             val_loss.update(loss.item(),data.size(0))
             val_dice.update(output, target)
-    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_frac': val_dice.avg[1]})
+    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_frac': val_dice.avg[1], 'Val_Precision': val_dice.precision, 'Val_Recall': val_dice.recall, 'Val_F1': val_dice.F1, 'Val_fpr': val_dice.fpr})
     return val_log
 
 def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
@@ -56,7 +56,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         train_dice.update(output, target)
         # train_dice.update(output, target)
 
-    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1]})
+    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1], 'Train_Precision': train_dice.precision, 'Train_Recall': train_dice.recall, 'Train_F1': train_dice.F1, 'Train_fpr': train_dice.fpr})
     return val_log
 
 
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # loss = nn.CrossEntropyLoss()
     
     if log.log is not None:
-        best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
+        best = [log.log.idxmax()['Val_Recall']+1, log.log.max()['Val_Recall']]
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
@@ -119,11 +119,11 @@ if __name__ == '__main__':
         state = {'net': model.state_dict(),'optimizer':optimizer.state_dict(),'epoch': epoch}
         torch.save(state, os.path.join(save_path, 'latest_model.pth'))
         trigger += 1
-        if val_log['Val_dice_frac'] > best[1]:
+        if val_log['Val_Recall'] > best[1]:
             print('Saving best model')
             torch.save(state, os.path.join(save_path, 'best_model.pth'))
             best[0] = epoch
-            best[1] = val_log['Val_dice_frac']
+            best[1] = val_log['Val_Recall']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
 
@@ -144,4 +144,16 @@ if __name__ == '__main__':
         ax = log.log.plot(x='epoch', y='Val_Loss', grid=True, title='Val_Loss')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'loss.png'))
+        # plt.show()
+        ax = log.log.plot(x='epoch', y='Val_Recall', grid=True, title='Val_Recall')
+        fig = ax.get_figure()
+        fig.savefig(os.path.join(save_path, 'recall.png'))
+        # plt.show()
+        ax = log.log.plot(x='epoch', y='Val_fpr', grid=True, title='Val_fpr')
+        fig = ax.get_figure()
+        fig.savefig(os.path.join(save_path, 'fpr.png'))
+        # plt.show()
+        ax = log.log.plot(x='Val_Precision', y='Val_Recall', grid=True, title='Val_PR_Curve')
+        fig = ax.get_figure()
+        fig.savefig(os.path.join(save_path, 'prcurve.png'))
         # plt.show()
