@@ -47,7 +47,6 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         optimizer.zero_grad()
 
         output = model(data)
-        output[output<0] = 0
         loss = loss_func(output, target)
 
         loss.backward()
@@ -120,11 +119,11 @@ if __name__ == '__main__':
         state = {'net': model.state_dict(),'optimizer':optimizer.state_dict(),'epoch': epoch}
         torch.save(state, os.path.join(save_path, 'latest_model.pth'))
         trigger += 1
-        if val_log['Val_Recall'] > best[1]:
+        if val_log['Val_dice_frac'] > best[1]:
             print('Saving best model')
             torch.save(state, os.path.join(save_path, 'best_model.pth'))
             best[0] = epoch
-            best[1] = val_log['Val_Recall']
+            best[1] = val_log['Val_dice_frac']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
 
