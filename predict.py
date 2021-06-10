@@ -12,7 +12,8 @@ from tqdm import tqdm
 
 from dataset.fracnet_dataset import FracNetInferenceDataset
 from dataset import transforms as tsfm
-from model.unet import UNet
+from model.UNet3d import UNet
+import config
 
 
 def _remove_low_probs(pred, prob_thresh):
@@ -133,8 +134,8 @@ def predict(args):
         tsfm.MinMaxNorm(-200, 1000)
     ]
 
-    image_path_list = sorted([os.path.join(args.image_dir, file)
-        for file in os.listdir(args.image_dir) if "nii" in file])
+    image_path_list = sorted([os.path.join(args.test_data_path, file)
+        for file in os.listdir(args.test_data_path) if "nii" in file])
     image_id_list = [os.path.basename(path).split("-")[0]
         for path in image_path_list]
 
@@ -160,27 +161,5 @@ def predict(args):
 
 
 if __name__ == "__main__":
-    import argparse
-
-
-    prob_thresh = 0.1
-    bone_thresh = 300
-    size_thresh = 100
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image_dir", required=True,
-        help="The image nii directory.")
-    parser.add_argument("--pred_dir", required=True,
-        help="The directory for saving predictions.")
-    parser.add_argument("--model_path", default=None,
-        help="The PyTorch model weight path.")
-    parser.add_argument("--prob_thresh", default=0.1,
-        help="Prediction probability threshold.")
-    parser.add_argument("--bone_thresh", default=300,
-        help="Bone binarization threshold.")
-    parser.add_argument("--size_thresh", default=100,
-        help="Prediction size threshold.")
-    parser.add_argument("--postprocess", default="True",
-        help="Whether to execute post-processing.")
-    args = parser.parse_args()
+    args = config.args
     predict(args)

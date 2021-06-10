@@ -36,9 +36,9 @@ parser.add_argument('--val_crop_max_size', type=int, default=96)
 
 # test
 parser.add_argument('--postprocess', type=bool, default=True, help='post process')
-parser.add_argument('--model_path', default='./runs/best_model.pth',help='test model path')
+parser.add_argument('--model_path', default='./runs/ex3/best_model.pth',help='test model path')
 parser.add_argument("--pred_dir", default='./predict', help="The directory for saving predictions.")
-parser.add_argument('--test_data_path',default = './datasets/ribfrac-test-images/',help='Testset path')
+parser.add_argument('--test_data_path',default = '../unet/datasets/test',help='Testset path')
 parser.add_argument("--prob_thresh", default=0.1, help="Prediction probability threshold.")
 parser.add_argument("--bone_thresh", default=300, help="Bone binarization threshold.")
 parser.add_argument("--size_thresh", default=100, help="Prediction size threshold.")
