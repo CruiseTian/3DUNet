@@ -96,8 +96,8 @@ if __name__ == '__main__':
     else:
         # model.apply(weights_init.init_model)
         log = logger.Train_Logger(save_path,"train_log")
-        # optimizer = optim.Adam(model.parameters(), lr=args.lr)
-        optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
         start_epoch = 1
     common.print_network(model)
  
