@@ -87,8 +87,8 @@ if __name__ == '__main__':
 
         model.load_state_dict(checkpoint['net'])
 
-        # optimizer = optim.Adam(model.parameters(), lr=args.lr)
-        optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr)
+        # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
         optimizer.load_state_dict(checkpoint['optimizer'])
 
         start_epoch = checkpoint['epoch'] + 1
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     trigger = 0  # early stop 计数器
     alpha = 0.4 # 深监督衰减系数初始值
     for epoch in range(start_epoch, start_epoch + args.epochs):
-        common.adjust_learning_rate(optimizer, epoch, args)
+        # common.adjust_learning_rate(optimizer, epoch, args)
         train_log = train(model, train_loader, optimizer, loss, args.n_labels, alpha)
         val_log = val(model, val_loader, loss, args.n_labels)
         log.update(epoch,train_log,val_log)
