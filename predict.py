@@ -145,7 +145,7 @@ def predict(args):
         dataset = FracNetInferenceDataset(image_path, transforms=transforms)
         dataloader = FracNetInferenceDataset.get_dataloader(dataset,
             batch_size, num_workers)
-        pred_arr = _predict_single_image(model, dataloader, postprocess,
+        pred_arr = _predict_single_image(model, dataloader, args.postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
         pred_image, pred_info = _make_submission_files(pred_arr, image_id,
             dataset.image_affine)
