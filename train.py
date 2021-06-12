@@ -66,11 +66,11 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # data info
-    ds_train = TrainDataset(args.train_image_dir, args.train_label_dir)
+    ds_train = TrainDataset(args, args.train_image_dir, args.train_label_dir)
     # train_loader = DataLoader(ds_train, args.batch_size, False,
     #     args.workers, collate_fn=TrainDataset.collate_fn)
     train_loader = TrainDataset.get_dataloader(ds_train, args.batch_size, False, args.workers)
-    ds_val = TrainDataset(args.val_image_dir, args.val_label_dir)
+    ds_val = TrainDataset(args, args.val_image_dir, args.val_label_dir)
     # val_loader = DataLoader(ds_val, args.batch_size, False,
     #     args.workers, collate_fn=TrainDataset.collate_fn)
     val_loader = TrainDataset.get_dataloader(ds_val, args.batch_size, False, args.workers)
