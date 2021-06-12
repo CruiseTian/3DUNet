@@ -4,7 +4,7 @@ import random
 import numpy as np
 import SimpleITK as sitk
 import torch
-from torch.utils.data import Dataset as dataset
+from torch.utils.data import Dataset as dataset, DataLoader
 from .transforms import Window, Normalize, Compose
 import nibabel as nib
 from skimage.measure import regionprops
@@ -166,3 +166,8 @@ class TrainDataset(dataset):
         label_rois = torch.cat([x[1] for x in samples])
 
         return image_rois, label_rois
+
+    @staticmethod
+    def get_dataloader(dataset, batch_size, shuffle=False, num_workers=0):
+        return DataLoader(dataset, batch_size, shuffle,
+            num_workers=num_workers, collate_fn=TrainDataset.collate_fn)
