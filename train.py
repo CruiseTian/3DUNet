@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import config
 from model.UNet import UNet
 from dataset.train_dataset import TrainDataset
-from dataset.test_dataset import TestDataset
 from utils import logger, metrics, common
 from utils.loss import MixLoss, DiceLoss
 

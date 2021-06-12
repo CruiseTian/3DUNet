@@ -9,11 +9,13 @@ from scipy import ndimage
 from skimage.measure import label, regionprops
 from skimage.morphology import disk, remove_small_objects
 from tqdm import tqdm
+from torch.utils.data import DataLoader
 
-from dataset.fracnet_dataset import FracNetInferenceDataset
+from dataset.test_dataset import TestDataset
 from dataset import transforms as tsfm
-from model.UNet3d import UNet
+from model.UNet import UNet
 import config
+from utils.common import test_collate_fn
 
 
 def _remove_low_probs(pred, prob_thresh):
@@ -143,9 +145,8 @@ def predict(args):
     progress = tqdm(total=len(image_id_list))
     pred_info_list = []
     for image_id, image_path in zip(image_id_list, image_path_list):
-        dataset = FracNetInferenceDataset(image_path, transforms=transforms)
-        dataloader = FracNetInferenceDataset.get_dataloader(dataset,
-            batch_size, num_workers)
+        dataset = TestDataset(image_path, transforms=transforms)
+        dataloader = DataLoader(dataset, batch_size, num_workers, collate_fn=test_collate_fn)
         pred_arr = _predict_single_image(model, dataloader, args.postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
         pred_image, pred_info = _make_submission_files(pred_arr, image_id,

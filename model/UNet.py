@@ -1,6 +1,4 @@
 from torch import nn
-from .encoder import EncoderBlock
-from .decoder import DecoderBlock
 
 class ConvBlock(nn.Module):
     def __init__(self, in_channels, out_channels, k_size=3, stride=1, padding=1):
