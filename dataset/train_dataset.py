@@ -11,7 +11,7 @@ from skimage.measure import regionprops
 from itertools import product
 
 class TrainDataset(dataset):
-    def __init__(self, args, image_dir, label_dir=None):
+    def __init__(self, args, image_dir, label_dir=None, train=True):
 
         self.args = args
         self.image_dir = image_dir
@@ -23,7 +23,7 @@ class TrainDataset(dataset):
                 Window(args.lower, args.upper),
                 Normalize(args.lower, args.upper)
             ])
-        self.train=True
+        self.train=train
         self.num_samples = 4
         self.crop_size = 64
 

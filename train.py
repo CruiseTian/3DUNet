@@ -68,11 +68,11 @@ if __name__ == '__main__':
     # data info
     ds_train = TrainDataset(args, args.train_image_dir, args.train_label_dir)
     train_loader = DataLoader(dataset=ds_train, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, collate_fn=TrainDataset.collate_fn)
+        num_workers=args.workers, collate_fn=common.train_collate_fn)
     # train_loader = TrainDataset.get_dataloader(ds_train, args.batch_size, False, args.workers)
     ds_val = TrainDataset(args, args.val_image_dir, args.val_label_dir)
     val_loader = DataLoader(dataset=ds_val, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.workers, collate_fn=TrainDataset.collate_fn)
+        num_workers=args.workers, collate_fn=common.train_collate_fn)
     # val_loader = TrainDataset.get_dataloader(ds_val, args.batch_size, False, args.workers)
 
     # model info
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     loss = MixLoss(nn.BCEWithLogitsLoss(), 0.5, DiceLoss(), 1)
     
     if log.log is not None:
-        best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
+        best = [log.log.idxmax()['Val_Dice']+1, log.log.max()['Val_Dice']]
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
@@ -112,11 +112,11 @@ if __name__ == '__main__':
         state = {'net': model.state_dict(),'optimizer':optimizer.state_dict(),'epoch': epoch}
         torch.save(state, os.path.join(save_path, 'latest_model.pth'))
         trigger += 1
-        if val_log['Val_dice_frac'] > best[1]:
+        if val_log['Val_Dice'] > best[1]:
             print('Saving best model')
             torch.save(state, os.path.join(save_path, 'best_model.pth'))
             best[0] = epoch
-            best[1] = val_log['Val_dice_frac']
+            best[1] = val_log['Val_Dice']
             trigger = 0
         print('Best performance at Epoch: {} | {}'.format(best[0],best[1]))
 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
                 break
         torch.cuda.empty_cache()
 
-        ax = log.log.plot(x='epoch', y='Val_dice_frac', grid=True, title='Val_dice_frac')
+        ax = log.log.plot(x='epoch', y='Val_Dice', grid=True, title='Val_Dice')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'dice.png'))
         # plt.show()
