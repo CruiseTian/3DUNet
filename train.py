@@ -11,11 +11,11 @@ from collections import OrderedDict
 import matplotlib.pyplot as plt
 
 import config
-from model.UNet3d import UNet
-from dataset.fracnet_dataset import FracNetTrainDataset
-from dataset import transforms as tsfm
-from utils import loss, logger, metrics, common, weights_init
-from utils.losses import MixLoss, DiceLoss
+from model.UNet import UNet
+from dataset.train_dataset import TrainDataset
+from dataset.test_dataset import TestDataset
+from utils import logger, metrics, common
+from utils.loss import MixLoss, DiceLoss
 
 def val(model, val_loader, loss_func, n_labels):
     model.eval()
@@ -31,7 +31,7 @@ def val(model, val_loader, loss_func, n_labels):
             
             val_loss.update(loss.item(),data.size(0))
             val_dice.update(output, target)
-    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_dice_frac': val_dice.avg[1], 'Val_Precision': val_dice.precision, 'Val_Recall': val_dice.recall, 'Val_F1': val_dice.F1, 'Val_fpr': val_dice.fpr})
+    val_log = OrderedDict({'Val_Loss': val_loss.avg, 'Val_Dice': val_dice.avg[1], 'Val_Precision': val_dice.precision, 'Val_Recall': val_dice.recall, 'Val_F1': val_dice.F1})
     return val_log
 
 def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
@@ -56,7 +56,7 @@ def train(model, train_loader, optimizer, loss_func, n_labels, alpha):
         train_dice.update(output, target)
         # train_dice.update(output, target)
 
-    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_dice_frac': train_dice.avg[1], 'Train_Precision': train_dice.precision, 'Train_Recall': train_dice.recall, 'Train_F1': train_dice.F1, 'Train_fpr': train_dice.fpr})
+    val_log = OrderedDict({'Train_Loss': train_loss.avg, 'Train_Dice': train_dice.avg[1], 'Train_Precision': train_dice.precision, 'Train_Recall': train_dice.recall, 'Train_F1': train_dice.F1})
     return val_log
 
 
@@ -65,19 +65,14 @@ if __name__ == '__main__':
     save_path = os.path.join('./runs', args.save_path)
     if not os.path.exists(save_path): os.makedirs(save_path)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    transforms = [
-        tsfm.Window(-200, 1000),
-        tsfm.MinMaxNorm(-200, 1000)
-    ]
+
     # data info
-    ds_train = FracNetTrainDataset(args.train_image_dir, args.train_label_dir,
-        transforms=transforms)
-    train_loader = FracNetTrainDataset.get_dataloader(ds_train, args.batch_size, False,
-        args.workers)
-    ds_val = FracNetTrainDataset(args.val_image_dir, args.val_label_dir,
-        transforms=transforms)
-    val_loader = FracNetTrainDataset.get_dataloader(ds_val, args.batch_size, False,
-        args.workers)
+    ds_train = TrainDataset(args.train_image_dir, args.train_label_dir)
+    train_loader = DataLoader(ds_train, args.batch_size, False,
+        args.workers, collate_fn=common.train_collate_fn)
+    ds_val = TrainDataset(args.val_image_dir, args.val_label_dir)
+    val_loader = DataLoader(ds_val, args.batch_size, False,
+        args.workers, collate_fn=common.train_collate_fn)
 
     # model info
     model = UNet(1, args.n_labels).to(device)
@@ -88,25 +83,20 @@ if __name__ == '__main__':
         model.load_state_dict(checkpoint['net'])
 
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
-        # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
         optimizer.load_state_dict(checkpoint['optimizer'])
 
         start_epoch = checkpoint['epoch'] + 1
         log = logger.Train_Logger(save_path,"train_log",init=os.path.join(save_path,"train_log.csv"))
     else:
-        # model.apply(weights_init.init_model)
         log = logger.Train_Logger(save_path,"train_log")
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
-        # optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
         start_epoch = 1
     common.print_network(model)
  
-    # loss = loss.DiceLoss()
     loss = MixLoss(nn.BCEWithLogitsLoss(), 0.5, DiceLoss(), 1)
-    # loss = nn.CrossEntropyLoss()
     
     if log.log is not None:
-        best = [log.log.idxmax()['Val_Recall']+1, log.log.max()['Val_Recall']]
+        best = [log.log.idxmax()['Val_dice_frac']+1, log.log.max()['Val_dice_frac']]
     else:
         best = [0,0]
     trigger = 0  # early stop 计数器
@@ -154,8 +144,4 @@ if __name__ == '__main__':
         ax = log.log.plot(x='epoch', y='Val_fpr', grid=True, title='Val_fpr')
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'fpr.png'))
-        # plt.show()
-        ax = log.log.plot(x='Val_Precision', y='Val_Recall', grid=True, title='Val_PR_Curve')
-        fig = ax.get_figure()
-        fig.savefig(os.path.join(save_path, 'prcurve.png'))
         # plt.show()

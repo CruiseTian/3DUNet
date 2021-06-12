@@ -2,25 +2,30 @@ import numpy as np
 
 
 class Window:
-
-    def __init__(self, window_min, window_max):
-        self.window_min = window_min
-        self.window_max = window_max
+    def __init__(self, lower, upper):
+        self.lower = lower
+        self.upper = upper
 
     def __call__(self, image):
-        image = np.clip(image, self.window_min, self.window_max)
+        image = np.clip(image, self.lower, self.upper)
 
         return image
 
-
-class MinMaxNorm:
-
+class Normalize:
     def __init__(self, low, high):
         self.low = low
         self.high = high
 
-    def __call__(self, image):
-        image = (image - self.low) / (self.high - self.low)
-        image = image * 2 - 1
+    def __call__(self, img):
+        img = (img - self.low) / (self.high - self.low)
+        img = img * 2 - 1
+        return img
 
-        return image
+class Compose:
+    def __init__(self, transforms):
+        self.transforms = transforms
+
+    def __call__(self, img):
+        for t in self.transforms:
+            img = t(img)
+        return img

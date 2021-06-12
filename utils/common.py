@@ -37,18 +37,6 @@ def center_crop_3d(img, label, slice_num=16):
     crop_label = label[left_x:right_x]
     return crop_img, crop_label
 
-def load_file_name_list(file_path):
-    file_name_list = []
-    with open(file_path, 'r') as file_to_read:
-        while True:
-            lines = file_to_read.readline().strip()  # 整行读取数据
-            if not lines:
-                break
-                pass
-            file_name_list.append(lines)
-            pass
-    return file_name_list
-
 def print_network(net):
     num_params = 0
     for param in net.parameters():
@@ -57,12 +45,22 @@ def print_network(net):
     print('Total number of parameters: %d' % num_params)
 
 def adjust_learning_rate(optimizer, epoch, args):
-    """Sets the learning rate to the initial LR decayed by 2 every 15 epochs"""
-    lr = args.lr * (0.5 ** (epoch // 15))
+    """Sets the learning rate to the initial LR decayed by 2 every 10 epochs"""
+    if epoch <= 10:
+        lr = args.lr
+    else:
+        lr = args.lr * (0.5 ** ((epoch-10) // 10))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
-def adjust_learning_rate_V2(optimizer, lr):
-    """Sets the learning rate to a fixed number"""
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
+def train_collate_fn(samples):
+        image_rois = torch.cat([x[0] for x in samples])
+        label_rois = torch.cat([x[1] for x in samples])
+
+        return image_rois, label_rois
+
+def test_collate_fn(samples):
+        images = torch.stack([x[0] for x in samples])
+        centers = [x[1] for x in samples]
+
+        return images, centers

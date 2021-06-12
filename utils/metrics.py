@@ -36,7 +36,6 @@ class DiceAverage(object):
         self.precision = 0
         self.recall = 0
         self.F1 = 0
-        self.fpr = 0
 
     def update(self, logits, targets):
         self.value = DiceAverage.get_dices(logits, targets)
@@ -47,7 +46,6 @@ class DiceAverage(object):
         self.precision = output[0]
         self.recall = output[1]
         self.F1 = output[2]
-        self.fpr = output[3]
         # print(self.value)
 
     @staticmethod
@@ -75,5 +73,4 @@ class DiceAverage(object):
         precision = TP / (TP + FP)
         recall = TP / (TP + FN)
         F1 = 2 * precision * recall / (precision + recall)
-        fpr =  FP / (FP + TN)
-        return precision, recall, F1, fpr
+        return precision, recall, F1

@@ -118,6 +118,7 @@ def _make_submission_files(pred, image_id, affine):
 
 
 def predict(args):
+    if not os.path.exists(args.pred_dir): os.makedirs(args.pred_dir)
     num_workers = 0
     batch_size = 1
     postprocess = True if args.postprocess == "True" else False
