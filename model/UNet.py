@@ -52,7 +52,7 @@ class UNet(nn.Module):
         self.dec1 = DecBlock(root_feat_maps * 8, root_feat_maps * 4)
         self.dec2 = DecBlock(root_feat_maps * 4, root_feat_maps * 2)
         self.dec3 = DecBlock(root_feat_maps * 2, root_feat_maps)
-        self.conv2 = nn.Conv3d(in_channels, out_channels, 1)
+        self.conv2 = nn.Conv3d(root_feat_maps, out_channels, 1)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
