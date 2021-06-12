@@ -159,3 +159,10 @@ class TrainDataset(dataset):
 
     def __len__(self):
         return len(self.files_prefix)
+
+    @staticmethod
+    def collate_fn(samples):
+        image_rois = torch.cat([x[0] for x in samples])
+        label_rois = torch.cat([x[1] for x in samples])
+
+        return image_rois, label_rois

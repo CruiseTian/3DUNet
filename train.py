@@ -68,10 +68,10 @@ if __name__ == '__main__':
     # data info
     ds_train = TrainDataset(args.train_image_dir, args.train_label_dir)
     train_loader = DataLoader(ds_train, args.batch_size, False,
-        args.workers, collate_fn=common.train_collate_fn)
+        args.workers, collate_fn=TrainDataset.collate_fn)
     ds_val = TrainDataset(args.val_image_dir, args.val_label_dir)
     val_loader = DataLoader(ds_val, args.batch_size, False,
-        args.workers, collate_fn=common.train_collate_fn)
+        args.workers, collate_fn=TrainDataset.collate_fn)
 
     # model info
     model = UNet(1, args.n_labels).to(device)
