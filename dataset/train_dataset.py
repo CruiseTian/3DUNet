@@ -9,6 +9,7 @@ from .transforms import Window, Normalize, Compose
 import nibabel as nib
 from skimage.measure import regionprops
 from itertools import product
+from utils.process import get_roi_centroids, crop_roi
 
 class TrainDataset(dataset):
     def __init__(self, args, image_dir, label_dir=None, train=True):
@@ -138,12 +139,17 @@ class TrainDataset(dataset):
         image_arr = img_array.astype(np.float32)
 
         # calculate rois' centroids
-        roi_centroids = self._get_roi_centroids(label_arr)
+        # roi_centroids = self._get_roi_centroids(label_arr)
+        roi_centroids = get_roi_centroids(label_arr, self.crop_size, self.num_samples, self.train)
 
         # crop rois
-        image_rois = [self._crop_roi(image_arr, centroid)
+        # image_rois = [self._crop_roi(image_arr, centroid)
+        #     for centroid in roi_centroids]
+        # label_rois = [self._crop_roi(label_arr, centroid)
+        #     for centroid in roi_centroids]
+        image_rois = [crop_roi(image_arr, centroid, self.crop_size)
             for centroid in roi_centroids]
-        label_rois = [self._crop_roi(label_arr, centroid)
+        label_rois = [crop_roi(label_arr, centroid, self.crop_size)
             for centroid in roi_centroids]
 
         if self.transforms:
