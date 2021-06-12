@@ -142,7 +142,3 @@ if __name__ == '__main__':
         fig = ax.get_figure()
         fig.savefig(os.path.join(save_path, 'recall.png'))
         # plt.show()
-        ax = log.log.plot(x='epoch', y='Val_fpr', grid=True, title='Val_fpr')
-        fig = ax.get_figure()
-        fig.savefig(os.path.join(save_path, 'fpr.png'))
-        # plt.show()
