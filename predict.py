@@ -125,17 +125,12 @@ def predict(args):
     batch_size = 1
     postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = UNet(in_channels=1, num_classes=2).to(device)
+    model = UNet(in_channels=1, out_channels=2).to(device)
     model = torch.nn.DataParallel(model, device_ids=[0])
     model.eval()
     if args.model_path is not None:
         model_weights = torch.load(args.model_path)
         model.load_state_dict(model_weights['net'])
-
-    transforms = [
-        tsfm.Window(-200, 1000),
-        tsfm.MinMaxNorm(-200, 1000)
-    ]
 
     image_path_list = sorted([os.path.join(args.test_data_path, file)
         for file in os.listdir(args.test_data_path) if "nii" in file])
@@ -145,14 +140,14 @@ def predict(args):
     progress = tqdm(total=len(image_id_list))
     pred_info_list = []
     for image_id, image_path in zip(image_id_list, image_path_list):
-        dataset = TestDataset(image_path, transforms=transforms)
-        dataloader = DataLoader(dataset, batch_size, num_workers, collate_fn=test_collate_fn)
+        dataset = TestDataset(image_path, args)
+        dataloader = DataLoader(dataset=dataset, batch_size=batch_size, num_workers=num_workers, collate_fn=test_collate_fn)
         pred_arr = _predict_single_image(model, dataloader, args.postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
         pred_image, pred_info = _make_submission_files(pred_arr, image_id,
             dataset.image_affine)
         pred_info_list.append(pred_info)
-        pred_path = os.path.join(args.pred_dir, f"{image_id}-pred.nii.gz")
+        pred_path = os.path.join(args.pred_dir, f"{image_id}.nii.gz")
         nib.save(pred_image, pred_path)
 
         progress.update()
