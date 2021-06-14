@@ -125,7 +125,7 @@ def predict(args):
     batch_size = 1
     postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = UNet(in_channels=1, out_channels=2).to(device)
+    model = UNet(1, 2).to(device)
     model = torch.nn.DataParallel(model, device_ids=[0])
     model.eval()
     if args.model_path is not None:
