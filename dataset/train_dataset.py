@@ -6,7 +6,6 @@ import SimpleITK as sitk
 import torch
 from torch.utils.data import Dataset as dataset, DataLoader
 from .transforms import Window, Normalize, Compose
-import nibabel as nib
 from utils.process import get_roi_centroids, crop_roi
 
 class TrainDataset(dataset):
