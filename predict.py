@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 
 from dataset.test_dataset import TestDataset
 from dataset import transforms as tsfm
-from model.UNet import UNet
+from model.UNet3d import UNet
 import config
 from utils.common import test_collate_fn
 
