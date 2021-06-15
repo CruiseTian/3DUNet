@@ -18,13 +18,12 @@ import config
 from utils.common import test_collate_fn
 
 
-def _remove_low_probs(pred, prob_thresh):
+def post_process(pred, image, prob_thresh, bone_thresh, size_thresh):
+
+    # 去除低置信度预测
     pred = np.where(pred > prob_thresh, pred, 0)
 
-    return pred
-
-
-def _remove_spine_fp(pred, image, bone_thresh):
+    # 去除误报
     image_bone = image > bone_thresh
     image_bone_2d = image_bone.sum(axis=-1)
     image_bone_2d = ndimage.median_filter(image_bone_2d, 10)
@@ -44,11 +43,9 @@ def _remove_spine_fp(pred, image, bone_thresh):
         max_region.bbox[0]:max_region.bbox[2],
         max_region.bbox[1]:max_region.bbox[3]
     ] = max_region.convex_image > 0
+    pred = np.where(image_spine[..., np.newaxis], 0, pred)
 
-    return np.where(image_spine[..., np.newaxis], 0, pred)
-
-
-def _remove_small_objects(pred, size_thresh):
+    # 移除小连接区域
     pred_bin = pred > 0
     pred_bin = remove_small_objects(pred_bin, size_thresh)
     pred = np.where(pred_bin, pred, 0)
@@ -56,21 +53,7 @@ def _remove_small_objects(pred, size_thresh):
     return pred
 
 
-def _post_process(pred, image, prob_thresh, bone_thresh, size_thresh):
-
-    # remove connected regions with low confidence
-    pred = _remove_low_probs(pred, prob_thresh)
-
-    # remove spine false positives
-    pred = _remove_spine_fp(pred, image, bone_thresh)
-
-    # remove small connected regions
-    pred = _remove_small_objects(pred, size_thresh)
-
-    return pred
-
-
-def _predict_single_image(model, dataloader, postprocess, prob_thresh,
+def predict_single_image(model, dataloader, postprocess, prob_thresh,
         bone_thresh, size_thresh):
     pred = np.zeros(dataloader.dataset.image.shape)
     crop_size = dataloader.dataset.crop_size
@@ -95,18 +78,18 @@ def _predict_single_image(model, dataloader, postprocess, prob_thresh,
 
 
     if postprocess:
-        pred = _post_process(pred, dataloader.dataset.image, prob_thresh,
+        pred = post_process(pred, dataloader.dataset.image, prob_thresh,
             bone_thresh, size_thresh)
 
     return pred
 
 
-def _make_submission_files(pred, image_id, affine):
+def make_submission_files(pred, image_id, affine):
     pred_label = label(pred > 0).astype(np.int16)
     pred_regions = regionprops(pred_label, pred)
     pred_index = [0] + [region.label for region in pred_regions]
     pred_proba = [0.0] + [region.mean_intensity for region in pred_regions]
-    # placeholder for label class since classifaction isn't included
+    
     pred_label_code = [0] + [1] * int(pred_label.max())
     pred_image = nib.Nifti1Image(pred_label, affine)
     pred_info = pd.DataFrame({
@@ -123,7 +106,6 @@ def predict(args):
     if not os.path.exists(args.pred_dir): os.makedirs(args.pred_dir)
     num_workers = 0
     batch_size = 1
-    postprocess = True if args.postprocess == "True" else False
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = UNet(1, 2).to(device)
     model = torch.nn.DataParallel(model, device_ids=[0])
@@ -142,9 +124,9 @@ def predict(args):
     for image_id, image_path in zip(image_id_list, image_path_list):
         dataset = TestDataset(image_path, args)
         dataloader = DataLoader(dataset=dataset, batch_size=batch_size, num_workers=num_workers, collate_fn=test_collate_fn)
-        pred_arr = _predict_single_image(model, dataloader, args.postprocess,
+        pred_arr = predict_single_image(model, dataloader, args.postprocess,
             args.prob_thresh, args.bone_thresh, args.size_thresh)
-        pred_image, pred_info = _make_submission_files(pred_arr, image_id,
+        pred_image, pred_info = make_submission_files(pred_arr, image_id,
             dataset.image_affine)
         pred_info_list.append(pred_info)
         pred_path = os.path.join(args.pred_dir, f"{image_id}.nii.gz")

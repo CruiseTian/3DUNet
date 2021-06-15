@@ -36,23 +36,23 @@ class DecBlock(nn.Module):
 class UNet(nn.Module):
     def __init__(self, in_channels, out_channels, root_feat_maps=16, pool_size=2):
         super(UNet, self).__init__()
-        self.conv1 = ConvBlock(in_channels, root_feat_maps)
-        self.enc1 = nn.Sequential(
+        self.first = ConvBlock(in_channels, root_feat_maps)
+        self.down1 = nn.Sequential(
             nn.MaxPool3d(pool_size),
             ConvBlock(root_feat_maps, root_feat_maps * 2)
         )
-        self.enc2 = nn.Sequential(
+        self.down2 = nn.Sequential(
             nn.MaxPool3d(pool_size),
             ConvBlock(root_feat_maps * 2, root_feat_maps * 4)
         )
-        self.enc3 = nn.Sequential(
+        self.down3 = nn.Sequential(
             nn.MaxPool3d(pool_size),
             ConvBlock(root_feat_maps * 4, root_feat_maps * 8)
         )
-        self.dec1 = DecBlock(root_feat_maps * 8, root_feat_maps * 4)
-        self.dec2 = DecBlock(root_feat_maps * 4, root_feat_maps * 2)
-        self.dec3 = DecBlock(root_feat_maps * 2, root_feat_maps)
-        self.conv2 = nn.Conv3d(root_feat_maps, out_channels, 1)
+        self.up1 = DecBlock(root_feat_maps * 8, root_feat_maps * 4)
+        self.up2 = DecBlock(root_feat_maps * 4, root_feat_maps * 2)
+        self.up3 = DecBlock(root_feat_maps * 2, root_feat_maps)
+        self.final = nn.Conv3d(root_feat_maps, out_channels, 1)
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
@@ -62,12 +62,12 @@ class UNet(nn.Module):
                 nn.init.constant_(m.bias, 0)
     
     def forward(self, x):
-        x1 = self.conv1(x)
-        x2 = self.enc1(x1)
-        x3 = self.enc2(x2)
-        x4 = self.enc3(x3)
-        x  = self.dec1(x4, x3)
-        x  = self.dec2(x, x2)
-        x  = self.dec3(x, x1)
-        x  = self.conv2(x)
-        return x
+        out1 = self.first(x)
+        out2 = self.down1(out1)
+        out3 = self.down2(out2)
+        out4 = self.down3(out3)
+        out  = self.up1(out4, out3)
+        out  = self.up2(out, out2)
+        out  = self.up3(out, out1)
+        out  = self.final(out)
+        return out
