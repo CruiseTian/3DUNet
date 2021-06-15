@@ -45,12 +45,8 @@ def print_network(net):
     print('Total number of parameters: %d' % num_params)
 
 def adjust_learning_rate(optimizer, epoch, args):
-    """Sets the learning rate to the initial LR decayed by 5 every 20 epochs"""
-    # if epoch <= 10:
-    #     lr = args.lr
-    # else:
-    #     lr = args.lr * (0.5 ** ((epoch-10) // 10))
-    lr = args.lr * (0.2 ** (epoch // 20))
+    """Sets the learning rate to the initial LR decayed by 2 every 15 epochs"""
+    lr = args.lr * (0.5 ** (epoch // 15))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
