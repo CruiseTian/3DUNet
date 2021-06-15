@@ -31,6 +31,7 @@ parser.add_argument('--early-stop', default=30, type=int, help='early stopping (
 parser.add_argument('--crop_size', type=int, default=64)
 
 # test
+parser.add_argument('--gpu', type=int,default=0, help='predict GPU')
 parser.add_argument('--postprocess', type=bool, default=True, help='post process')
 parser.add_argument('--model_path', default='./runs/ex3/best_model.pth',help='test model path')
 parser.add_argument("--pred_dir", default='./predict', help="The directory for saving predictions.")

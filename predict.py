@@ -108,7 +108,7 @@ def predict(args):
     batch_size = 1
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = UNet(1, 2).to(device)
-    model = torch.nn.DataParallel(model, device_ids=[0])
+    model = torch.nn.DataParallel(model, device_ids=[args.gpu])
     model.eval()
     if args.model_path is not None:
         model_weights = torch.load(args.model_path)
@@ -129,7 +129,7 @@ def predict(args):
         pred_image, pred_info = make_submission_files(pred_arr, image_id,
             dataset.image_affine)
         pred_info_list.append(pred_info)
-        pred_path = os.path.join(args.pred_dir, f"{image_id}.nii.gz")
+        pred_path = os.path.join(args.pred_dir, f"{image_id}-label.nii.gz")
         nib.save(pred_image, pred_path)
 
         progress.update()
