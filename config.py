@@ -38,7 +38,7 @@ parser.add_argument("--pred_dir", default='./predict', help="The directory for s
 parser.add_argument('--test_data_path',default = '../unet/datasets/ribfrac-test-images/',help='Testset path')
 parser.add_argument("--prob_thresh", default=0.1, type=float, help="Prediction probability threshold.")
 parser.add_argument("--bone_thresh", default=300, type=int, help="Bone binarization threshold.")
-parser.add_argument("--size_thresh", default=100, type=int, help="Prediction size threshold.")
+parser.add_argument("--size_thresh", default=200, type=int, help="Prediction size threshold.")
 
 
 args = parser.parse_args()
