@@ -7,6 +7,7 @@
     * [`UNet.py`](model/UNet.py): The 3D U-Net model.
 * [`utils/`](utils/): The useful scripts.
 * [`result/`](result/):
+    * [`best_model.pth`](result/best_model.pth): The model used for predict.
     * [`test_predict.zip`](result/test_predict.zip): The test dataset prediction results.
     * [`val_predict.zip`](result/val_predict.zip): The val dataset prediction results.
 * [`train.py`](train.py): The training script.
@@ -30,7 +31,7 @@ python train.py --lr 0.001 --gpu_id=[0,1,2,3] --batch_size 8 --train_image_dir '
 + `val_image_dir:` The folder where the val images are saved.
 + `val_label_dir:` The folder where the val labels are saved.
 
-For more parameter information, please check the `config.py` script.
+For more parameter information, please check the [`config.py`](config.py) script.
 
 ### Predict
 
@@ -43,5 +44,5 @@ python predict.py --gpu 0 --model_path ./result/best_model.pth --pred_dir ./pred
 + `pred_dir:` The folder to store the predict result.
 + `test_data_path:` The folder where the test images are saved.
 
-For more parameter information, please check the `config.py` script.
+For more parameter information, please check the [`config.py`](config.py) script.
 
